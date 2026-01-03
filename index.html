@@ -7,70 +7,60 @@
 
   <style>
     :root{
-      --bg: #ffffff;
-      --card: #ffffff;
-      --text: #111111;
-      --muted: #666666;
-      --border: #dddddd;
-      --border2: #eeeeee;
-      --btn: #f2f2f2;
-      --btnText: #111111;
-      --pill: #f8f8f8;
-      --shadow: rgba(0,0,0,0.06);
-      --danger: #e26;
-      --ok: #2a6;
-      --focus: rgba(80,140,255,0.35);
+      --bg:#ffffff; --card:#ffffff; --text:#111; --muted:#666;
+      --border:#ddd; --border2:#eee; --shadow:rgba(0,0,0,.07);
+      --btn:#f2f2f2; --btnText:#111; --pill:#f7f7f7;
+      --focus:rgba(80,140,255,.35);
     }
-
     [data-theme="dark"]{
-      --bg: #2b2d31;        /* dark gray, not black */
-      --card: #343741;
-      --text: #f2f2f2;
-      --muted: #b6bcc6;
-      --border: #4a4f5a;
-      --border2: #3e424b;
-      --btn: #404552;
-      --btnText: #f2f2f2;
-      --pill: #3a3f4a;
-      --shadow: rgba(0,0,0,0.25);
-      --danger: #ff5aa5;
-      --ok: #49d17d;
-      --focus: rgba(130,180,255,0.35);
+      --bg:#2b2d31; --card:#343741; --text:#f2f2f2; --muted:#b6bcc6;
+      --border:#4a4f5a; --border2:#3e424b; --shadow:rgba(0,0,0,.35);
+      --btn:#404552; --btnText:#f2f2f2; --pill:#3a3f4a;
+      --focus:rgba(130,180,255,.35);
     }
 
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      margin: 18px;
+    body{
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      margin: 12px;
       background: var(--bg);
       color: var(--text);
-      max-width: 1020px;
+      max-width: 980px;
     }
-
-    h1 { font-size: 20px; margin: 0 0 10px; }
-    h2 { font-size: 16px; margin: 0 0 8px; }
-    .muted { color: var(--muted); font-size: 13px; line-height: 1.35; }
+    h1{ font-size: 20px; margin: 0; }
+    h2{ font-size: 16px; margin: 0 0 8px; }
+    h3{ font-size: 14px; margin: 0 0 8px; }
+    .muted{ color: var(--muted); font-size: 13px; line-height: 1.35; }
 
     .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center; justify-content:space-between;
+      margin-bottom: 8px;
     }
 
-    .row { display: flex; gap: 14px; flex-wrap: wrap; }
-    .card {
+    .row{ display:flex; gap:12px; flex-wrap:wrap; }
+    .card{
       border: 1px solid var(--border);
-      border-radius: 12px;
+      background: var(--card);
+      border-radius: 14px;
       padding: 14px;
+      box-shadow: 0 2px 10px var(--shadow);
       flex: 1;
       min-width: 320px;
-      background: var(--card);
-      box-shadow: 0 2px 10px var(--shadow);
     }
 
-    textarea, input, select {
+    button{
+      padding: 12px 12px;
+      cursor:pointer;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--btn);
+      color: var(--btnText);
+      font-weight: 800;
+      touch-action: manipulation;
+    }
+    button:disabled{ opacity:.55; cursor:not-allowed; }
+
+    input, select, textarea{
       width: 100%;
       padding: 12px;
       border-radius: 10px;
@@ -78,153 +68,111 @@
       background: var(--bg);
       color: var(--text);
       outline: none;
+      font-size: 15px;
     }
-    textarea:focus, input:focus, select:focus { box-shadow: 0 0 0 4px var(--focus); border-color: transparent; }
-
-    textarea { height: 170px; }
-
-    button {
-      padding: 12px 12px;
-      cursor: pointer;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--btn);
-      color: var(--btnText);
-      font-weight: 700;
-      touch-action: manipulation;
+    textarea{ min-height: 80px; resize: vertical; }
+    input:focus, select:focus, textarea:focus{
+      box-shadow: 0 0 0 4px var(--focus);
+      border-color: transparent;
     }
-    button:disabled { opacity: 0.55; cursor: not-allowed; }
-    .btnRow { display:flex; gap:10px; flex-wrap: wrap; margin-top: 10px; }
-
-    .big { font-size: 28px; font-weight: 800; margin: 8px 0; }
-
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { border-bottom: 1px solid var(--border2); padding: 10px 6px; text-align: left; vertical-align: top; }
-
-    .pill {
-      display: inline-block;
-      padding: 2px 10px;
-      border: 1px solid var(--border);
-      background: var(--pill);
-      border-radius: 999px;
-      font-size: 12px;
-      margin-left: 6px;
-    }
-    .pill.danger { border-color: var(--danger); }
-    .pill.ok { border-color: var(--ok); }
-
-    .bucketGrid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .bucketBox{
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px;
-      background: var(--bg);
-    }
-    .bucketTitle{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 10px;
-      margin-bottom: 8px;
-      font-weight: 800;
-    }
-    .seriesList{
-      display:flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    .chip{
-      border: 1px solid var(--border);
-      background: var(--pill);
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-size: 13px;
-      user-select: none;
-    }
-
-    .inline{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap: wrap;
-    }
-    .checkRow{
-      display:flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
-    label.cb{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      padding: 8px 10px;
-      border-radius: 12px;
-      cursor:pointer;
-      user-select:none;
-    }
-    label.cb input{ width:auto; }
+    .inline{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
 
     .divider{ height: 1px; background: var(--border2); margin: 12px 0; }
+
+    .big{ font-size: 26px; font-weight: 900; margin: 8px 0; }
 
     /* Vegas-ish Spin button */
     .spinBtn{
       position: relative;
       padding: 14px 18px;
       font-size: 16px;
-      letter-spacing: 0.08em;
+      letter-spacing: .08em;
       text-transform: uppercase;
       border-radius: 999px;
       border: 2px solid transparent;
-      box-shadow:
-        0 10px 22px rgba(0,0,0,0.22),
-        inset 0 0 0 2px rgba(255,255,255,0.18);
+      box-shadow: 0 10px 22px rgba(0,0,0,.22), inset 0 0 0 2px rgba(255,255,255,.18);
       background:
-        radial-gradient(circle at 30% 20%, rgba(255,255,255,0.45), rgba(255,255,255,0) 40%),
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.45), rgba(255,255,255,0) 40%),
         linear-gradient(135deg, #ff4fd8, #ffcc00, #35d7ff, #8cff6b);
       color: #111;
     }
-    .spinBtn:active{ transform: translateY(1px) scale(0.99); }
+    .spinBtn:active{ transform: translateY(1px) scale(.99); }
     .spinBtn::after{
       content:"";
-      position:absolute;
-      inset:-3px;
+      position:absolute; inset:-3px;
       border-radius: 999px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.35), rgba(255,255,255,0), rgba(255,255,255,0.35));
+      background: linear-gradient(90deg, rgba(255,255,255,.35), rgba(255,255,255,0), rgba(255,255,255,.35));
       filter: blur(10px);
-      opacity: 0.55;
+      opacity: .55;
       z-index:-1;
     }
-    [data-theme="dark"] .spinBtn{
-      color: #0b0b0b;
-      box-shadow:
-        0 12px 28px rgba(0,0,0,0.45),
-        inset 0 0 0 2px rgba(255,255,255,0.12);
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border: 1px solid var(--border);
+      background: var(--pill);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .dot{
+      width: 10px; height: 10px; border-radius: 999px;
+      background: #999;
+      border: 1px solid rgba(0,0,0,.12);
     }
 
-    /* Manual dropdown bigger type */
-    .manualSelect{
-      font-size: 18px;
-      padding: 14px;
+    details{
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: var(--card);
+      box-shadow: 0 2px 10px var(--shadow);
+      margin-top: 12px;
     }
+    summary{
+      cursor:pointer;
+      font-weight: 900;
+      list-style: none;
+    }
+    summary::-webkit-details-marker{ display:none; }
 
-    /* Mobile friendliness */
-    @media (max-width: 720px){
-      body{ margin: 12px; }
+    .grid2{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .grid3{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .itemCard{
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .itemTop{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+    }
+    .itemName{
+      font-weight: 900;
+      line-height: 1.2;
+    }
+    .smallMuted{ color: var(--muted); font-size: 12px; line-height: 1.35; margin-top: 4px; }
+
+    table{ width:100%; border-collapse: collapse; font-size: 14px; }
+    th,td{ border-bottom:1px solid var(--border2); padding:10px 6px; text-align:left; vertical-align: top; }
+
+    @media (max-width: 760px){
       .card{ min-width: 100%; }
-      .bucketGrid{ grid-template-columns: 1fr; }
-      textarea{ height: 155px; }
-      .big{ font-size: 26px; }
-      .spinBtn{ width: 100%; justify-content:center; }
+      .grid2{ grid-template-columns: 1fr; }
+      .grid3{ grid-template-columns: 1fr; }
+      .spinBtn{ width: 100%; }
     }
   </style>
 </head>
@@ -233,196 +181,163 @@
   <div class="topbar">
     <h1 id="appTitle">Studio Spinner + Energy Tracker</h1>
     <div class="inline">
-      <button id="themeBtn" title="Toggle Light/Dark">Dark Mode</button>
+      <button id="themeBtn">Dark Mode</button>
+      <button id="syncBtn">Sync now</button>
     </div>
   </div>
 
-  <p class="muted">
-    Buckets hold your series. Choose which buckets are “in play,” then spin — or log manually without spinning.
-    Data is stored locally on this device.
-  </p>
+  <p class="muted" id="statusLine">Loading…</p>
 
+  <!-- SPINNER FIRST (phone-first) -->
   <div class="row">
     <div class="card">
-      <h2>Buckets</h2>
-      <p class="muted">Paste items into any bucket (one per line), then Save.</p>
+      <h2>Spin</h2>
 
-      <div class="bucketGrid">
-        <div class="bucketBox">
-          <div class="bucketTitle"><span>Active Series</span><span class="muted" id="count_active">0</span></div>
-          <textarea id="ta_active" placeholder="Belly Series&#10;Slats"></textarea>
-        </div>
-
-        <div class="bucketBox">
-          <div class="bucketTitle"><span>On Deck</span><span class="muted" id="count_onDeck">0</span></div>
-          <textarea id="ta_onDeck" placeholder="Pressed Landscapes"></textarea>
-        </div>
-
-        <div class="bucketBox">
-          <div class="bucketTitle"><span>Waiting</span><span class="muted" id="count_waiting">0</span></div>
-          <textarea id="ta_waiting" placeholder="Needs materials / drying / research"></textarea>
-        </div>
-
-        <div class="bucketBox">
-          <div class="bucketTitle"><span>Writing</span><span class="muted" id="count_writing">0</span></div>
-          <textarea id="ta_writing" placeholder="Poems, captions, artist statements, notes"></textarea>
-        </div>
-
-        <div class="bucketBox">
-          <div class="bucketTitle"><span>Archive</span><span class="muted" id="count_archive">0</span></div>
-          <textarea id="ta_archive" placeholder="Completed / paused long-term"></textarea>
-        </div>
-
-        <div class="bucketBox">
-          <div class="bucketTitle"><span>Admin</span><span class="muted" id="count_admin">0</span></div>
-          <textarea id="ta_admin" placeholder="Framing, packaging, website, inventory"></textarea>
-        </div>
+      <div class="inline" style="justify-content:space-between; width:100%;">
+        <div class="tag" id="inPlayTag"><span class="dot" style="background:#999"></span><span>In play: —</span></div>
+        <div class="tag" id="cloudTag"><span class="dot" id="cloudDot"></span><span id="cloudText">Cloud: —</span></div>
       </div>
-
-      <div class="btnRow">
-        <button id="saveBucketsBtn">Save buckets</button>
-        <button id="clearHistoryBtn">Clear history</button>
-        <button id="exportBtn">Export history (CSV)</button>
-      </div>
-
-      <p class="muted" id="status"></p>
 
       <div class="divider"></div>
 
-      <h2>Series chips</h2>
-      <p class="muted">These are just a quick visual inventory now (no moving).</p>
-      <div class="bucketGrid">
-        <div class="bucketBox">
-          <div class="bucketTitle"><span>Active</span></div>
-          <ul class="seriesList" id="chips_active"></ul>
-        </div>
-        <div class="bucketBox">
-          <div class="bucketTitle"><span>On Deck</span></div>
-          <ul class="seriesList" id="chips_onDeck"></ul>
-        </div>
-        <div class="bucketBox">
-          <div class="bucketTitle"><span>Waiting</span></div>
-          <ul class="seriesList" id="chips_waiting"></ul>
-        </div>
-        <div class="bucketBox">
-          <div class="bucketTitle"><span>Writing</span></div>
-          <ul class="seriesList" id="chips_writing"></ul>
-        </div>
-        <div class="bucketBox">
-          <div class="bucketTitle"><span>Archive</span></div>
-          <ul class="seriesList" id="chips_archive"></ul>
-        </div>
-        <div class="bucketBox">
-          <div class="bucketTitle"><span>Admin</span></div>
-          <ul class="seriesList" id="chips_admin"></ul>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Pick what’s “in play” for the spinner</h2>
-      <div class="checkRow" id="bucketChecks"></div>
-
-      <div class="divider"></div>
-
-      <h2>Spin result</h2>
       <div class="big" id="result">—</div>
       <div class="muted" id="resultMeta">Spin to get a suggestion, or log manually.</div>
 
       <div class="btnRow">
-        <button id="spinBtn" class="spinBtn">SPIN</button>
+        <button class="spinBtn" id="spinBtn">SPIN</button>
         <button id="workedBtn" disabled>Worked</button>
         <button id="skippedBtn" disabled>Skipped</button>
       </div>
 
       <div style="margin-top: 12px;">
-        <label class="muted">Optional note (e.g., “45m underpainting”):</label>
-        <input id="spinNoteInput" placeholder="" />
+        <label class="muted">Optional note (spin):</label>
+        <input id="spinNote" placeholder="e.g., “45m underpainting / 2 thumbnails / wrote outline”" />
       </div>
 
       <div class="divider"></div>
 
-      <h2>Manual log (no spin)</h2>
-      <p class="muted">Choose the series yourself and log it.</p>
+      <h3>Manual log (no spin)</h3>
       <div class="inline">
-        <select id="manualSelect" class="manualSelect"></select>
+        <select id="manualSelect" style="font-size:18px; padding:14px;"></select>
         <button id="manualWorkedBtn">Worked</button>
       </div>
 
       <div style="margin-top: 12px;">
         <label class="muted">Optional note (manual):</label>
-        <input id="manualNoteInput" placeholder="" />
+        <input id="manualNote" placeholder="" />
+      </div>
+
+      <div class="divider"></div>
+
+      <h3>Filters</h3>
+      <p class="muted">Choose which buckets are “in play” for spinning.</p>
+      <div class="grid2" id="bucketFilters"></div>
+
+      <div style="margin-top: 10px;">
+        <label class="muted">User label (stored locally):</label>
+        <input id="userLabel" placeholder="John" />
       </div>
     </div>
   </div>
 
-  <div class="row" style="margin-top:14px;">
-    <div class="card">
-      <h2>Energy stats</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Series</th>
-            <th>Chosen</th>
-            <th>Worked</th>
-            <th>Skipped</th>
-            <th>Follow-through</th>
-          </tr>
-        </thead>
-        <tbody id="statsBody"></tbody>
-      </table>
-      <p class="muted">Export the CSV anytime and send it back to me for analysis.</p>
-    </div>
+  <!-- Manage + Stats -->
+  <details open>
+    <summary>Manage buckets + series</summary>
+    <p class="muted" style="margin-top:8px;">
+      These edits write back to Google Sheets (authenticated by your token).
+      Descriptions are collapsible on each series card.
+    </p>
 
-    <div class="card">
-      <h2>Recent history</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>When</th>
-            <th>Series</th>
-            <th>Outcome</th>
-            <th>Note</th>
-          </tr>
-        </thead>
-        <tbody id="historyBody"></tbody>
-      </table>
+    <div class="divider"></div>
+
+    <div class="row">
+      <div class="card">
+        <h2>Buckets</h2>
+        <div class="btnRow">
+          <button id="addBucketBtn">+ Add bucket</button>
+        </div>
+        <div id="bucketList" class="grid2" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="card">
+        <h2>Series</h2>
+        <div class="btnRow">
+          <button id="addSeriesBtn">+ Add series</button>
+        </div>
+        <div id="seriesList" style="margin-top:10px;"></div>
+      </div>
     </div>
-  </div>
+  </details>
+
+  <details>
+    <summary>Stats + history</summary>
+
+    <div class="divider"></div>
+
+    <div class="row">
+      <div class="card">
+        <h2>Energy stats</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Series</th>
+              <th>Chosen</th>
+              <th>Worked</th>
+              <th>Skipped</th>
+              <th>Follow-through</th>
+            </tr>
+          </thead>
+          <tbody id="statsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Recent history</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>When</th>
+              <th>Series</th>
+              <th>Outcome</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </details>
 
 <script>
-  // ====== Storage Keys (device-local) ======
-  const LS_THEME   = "spinner_theme_v1";
-  const LS_BUCKETS = "spinner_buckets_v3";
-  const LS_HISTORY = "spinner_history_v3";
-  const LS_BUCKET_SELECTION = "spinner_bucket_selection_v1";
+  // ====== CONFIG (as requested: hardcoded for now) ======
+  const API_URL = "https://script.google.com/macros/s/AKfycbzUyR9mpcMPGWzZT4P2XoHsba_oARB5UXm0OkjbaGmqKg3rO3-6njpRhE5YlRVwtp3n/exec";
+  const API_TOKEN = "dbq2rku-QZY7cqy0bkm";
+  const APP_VERSION = "v2-sheet-sync-cards";
 
-  // ====== Bucket Definitions ======
-  const BUCKETS = [
-    { key: "active",  label: "Active Series" },
-    { key: "onDeck",  label: "On Deck" },
-    { key: "waiting", label: "Waiting" },
-    { key: "writing", label: "Writing" },
-    { key: "archive", label: "Archive" },
-    { key: "admin",   label: "Admin" }
-  ];
+  // ====== Local cache keys ======
+  const LS_THEME = "spinner_theme_v2";
+  const LS_USER  = "spinner_user_v2";
+  const LS_BUCKETS = "spinner_cache_buckets_v2";
+  const LS_SERIES  = "spinner_cache_series_v2";
+  const LS_EVENTS  = "spinner_cache_events_v2";
+  const LS_FILTERS = "spinner_bucket_filters_v2";
 
+  // ====== Helpers ======
   const el = (id) => document.getElementById(id);
-  const status = el("status");
-  const result = el("result");
-  const resultMeta = el("resultMeta");
+  const statusLine = el("statusLine");
+  const cloudDot = el("cloudDot");
+  const cloudText = el("cloudText");
 
-  const spinNoteInput = el("spinNoteInput");
-  const manualNoteInput = el("manualNoteInput");
+  function setCloud(ok, msg){
+    cloudDot.style.background = ok ? "#49d17d" : "#ff5aa5";
+    cloudText.textContent = msg;
+  }
 
-  const workedBtn = el("workedBtn");
-  const skippedBtn = el("skippedBtn");
-  const spinBtn = el("spinBtn");
-
-  const manualSelect = el("manualSelect");
-  const manualWorkedBtn = el("manualWorkedBtn");
-
-  let currentPick = null;
+  function escapeHtml(str) {
+    return String(str ?? "").replace(/[&<>"']/g, (m) => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[m]));
+  }
 
   function nowISO(){
     const d = new Date();
@@ -430,69 +345,62 @@
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
-  function splitLines(text){
-    return text.split("\n").map(s => s.trim()).filter(Boolean);
+  function uuid(){
+    // decent UUIDv4 for our purposes
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+      const r = Math.random()*16|0;
+      const v = c === "x" ? r : (r&0x3|0x8);
+      return v.toString(16);
+    });
   }
 
-  function joinLines(list){
-    return (list || []).join("\n");
+  function toBool(v){
+    if (v === true || v === false) return v;
+    const s = String(v).trim().toLowerCase();
+    if (["true","t","1","yes","y"].includes(s)) return true;
+    if (["false","f","0","no","n"].includes(s)) return false;
+    return false;
   }
 
-  function loadBuckets(){
-    try {
-      const raw = localStorage.getItem(LS_BUCKETS);
-      if (!raw) return null;
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
+  function normalizeHex(h){
+    if (!h) return "";
+    const s = String(h).trim();
+    if (!s) return "";
+    return s.startsWith("#") ? s : ("#" + s);
   }
 
-  function saveBucketsData(data){
-    localStorage.setItem(LS_BUCKETS, JSON.stringify(data));
-  }
+  // ====== JSONP (avoids CORS) ======
+  function jsonp(action, params = {}) {
+    return new Promise((resolve, reject) => {
+      const cb = "cb_" + Date.now() + "_" + Math.floor(Math.random()*1e6);
+      const timeout = setTimeout(() => {
+        cleanup();
+        reject(new Error("Timeout"));
+      }, 12000);
 
-  function getBucketsFromUI(){
-    const data = {};
-    for (const b of BUCKETS){
-      data[b.key] = splitLines(el(`ta_${b.key}`).value);
-    }
-    return data;
-  }
+      function cleanup(){
+        clearTimeout(timeout);
+        try { delete window[cb]; } catch {}
+        if (script && script.parentNode) script.parentNode.removeChild(script);
+      }
 
-  function setBucketsToUI(data){
-    for (const b of BUCKETS){
-      el(`ta_${b.key}`).value = joinLines((data && data[b.key]) || []);
-    }
-  }
+      window[cb] = (data) => {
+        cleanup();
+        resolve(data);
+      };
 
-  function loadHistory(){
-    try { return JSON.parse(localStorage.getItem(LS_HISTORY) || "[]"); }
-    catch { return []; }
-  }
+      const qs = new URLSearchParams({
+        action,
+        token: API_TOKEN,
+        callback: cb,
+        ...Object.fromEntries(Object.entries(params).map(([k,v]) => [k, String(v ?? "")]))
+      });
 
-  function saveHistory(history){
-    localStorage.setItem(LS_HISTORY, JSON.stringify(history));
-  }
-
-  function uniqueSeriesAllBuckets(data){
-    const set = new Set();
-    for (const b of BUCKETS){
-      for (const s of (data[b.key] || [])) set.add(s);
-    }
-    return Array.from(set);
-  }
-
-  function updateCounts(data){
-    for (const b of BUCKETS){
-      el(`count_${b.key}`).textContent = (data[b.key] || []).length;
-    }
-  }
-
-  function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, (m) => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
-    }[m]));
+      const script = document.createElement("script");
+      script.src = API_URL + "?" + qs.toString();
+      script.onerror = () => { cleanup(); reject(new Error("Network error")); };
+      document.body.appendChild(script);
+    });
   }
 
   // ====== Theme ======
@@ -501,270 +409,546 @@
     localStorage.setItem(LS_THEME, theme);
     el("themeBtn").textContent = (theme === "dark") ? "Light Mode" : "Dark Mode";
   }
-  function initTheme(){
-    const saved = localStorage.getItem(LS_THEME) || "light";
-    applyTheme(saved);
+
+  // ====== Cache ======
+  function loadCache(key, fallback){
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return fallback;
+      return JSON.parse(raw);
+    } catch { return fallback; }
+  }
+  function saveCache(key, data){
+    localStorage.setItem(key, JSON.stringify(data));
   }
 
-  // ====== Bucket selection for spinner ======
-  function defaultBucketSelection(){
+  // ====== State ======
+  let buckets = []; // from sheet
+  let series = [];  // from sheet
+  let events = [];  // last N from sheet (plus local cache)
+  let currentPick = null;
+
+  function getBucketById(id){ return buckets.find(b => String(b.bucket_id).trim() === String(id).trim()); }
+  function getSeriesById(id){ return series.find(s => String(s.series_id).trim() === String(id).trim()); }
+
+  function bucketLabel(b){ return b.bucket_name || b.bucket_id; }
+  function seriesLabel(s){ return s.series_name || s.series_id; }
+
+  function activeBuckets(){
+    return buckets
+      .filter(b => toBool(b.active) === true)
+      .sort((a,b)=> (Number(a.order||999) - Number(b.order||999)));
+  }
+
+  function activeSeries(){
+    return series.filter(s => toBool(s.active) === true);
+  }
+
+  // ====== Filters (in-play buckets) ======
+  function loadFilters(){
+    const f = loadCache(LS_FILTERS, null);
+    if (f && typeof f === "object") return f;
     const obj = {};
-    for (const b of BUCKETS) obj[b.key] = true; // default: all in play
+    for (const b of activeBuckets()) obj[b.bucket_id] = true;
     return obj;
   }
 
-  function loadBucketSelection(){
-    try {
-      const raw = localStorage.getItem(LS_BUCKET_SELECTION);
-      if (!raw) return defaultBucketSelection();
-      const parsed = JSON.parse(raw);
-      const base = defaultBucketSelection();
-      for (const k in base) base[k] = (parsed[k] !== undefined) ? !!parsed[k] : base[k];
-      return base;
-    } catch {
-      return defaultBucketSelection();
+  function saveFilters(f){ saveCache(LS_FILTERS, f); }
+
+  function inPlaySeries(){
+    const f = loadFilters();
+    const set = new Map();
+    for (const s of activeSeries()){
+      if (!f[s.bucket_id]) continue;
+      set.set(s.series_id, s);
     }
+    return Array.from(set.values()).sort((a,b)=>seriesLabel(a).localeCompare(seriesLabel(b)));
   }
 
-  function saveBucketSelection(sel){
-    localStorage.setItem(LS_BUCKET_SELECTION, JSON.stringify(sel));
-  }
+  function renderFilters(){
+    const f = loadFilters();
+    const wrap = el("bucketFilters");
+    wrap.innerHTML = "";
 
-  function renderBucketChecks(){
-    const container = el("bucketChecks");
-    container.innerHTML = "";
-    const sel = loadBucketSelection();
-
-    for (const b of BUCKETS){
-      const lab = document.createElement("label");
-      lab.className = "cb";
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.checked = !!sel[b.key];
+    for (const b of activeBuckets()){
+      const id = b.bucket_id;
+      const col = normalizeHex(b.color) || "#999";
+      const card = document.createElement("label");
+      card.className = "itemCard";
+      card.style.cursor = "pointer";
+      card.innerHTML = `
+        <div class="inline" style="justify-content:space-between;">
+          <div class="tag"><span class="dot" style="background:${col}"></span><span>${escapeHtml(bucketLabel(b))}</span></div>
+          <input type="checkbox" ${f[id] ? "checked" : ""} />
+        </div>
+        <div class="smallMuted">${escapeHtml(id)}</div>
+      `;
+      const cb = card.querySelector("input");
       cb.addEventListener("change", () => {
-        const current = loadBucketSelection();
-        current[b.key] = cb.checked;
-        saveBucketSelection(current);
+        const next = loadFilters();
+        next[id] = cb.checked;
+        saveFilters(next);
+        refreshInPlayTag();
       });
-      lab.appendChild(cb);
-      const span = document.createElement("span");
-      span.textContent = b.label;
-      lab.appendChild(span);
-      container.appendChild(lab);
+      wrap.appendChild(card);
     }
+    refreshInPlayTag();
   }
 
-  function getInPlaySeries(data){
-    const sel = loadBucketSelection();
-    const set = new Set();
-    for (const b of BUCKETS){
-      if (!sel[b.key]) continue;
-      for (const s of (data[b.key] || [])) set.add(s);
-    }
-    return Array.from(set);
+  function refreshInPlayTag(){
+    const list = inPlaySeries();
+    el("inPlayTag").querySelector("span:last-child").textContent = `In play: ${list.length}`;
   }
 
-  // ====== Chips (display only) ======
-  function renderChips(data){
-    for (const b of BUCKETS){
-      const ul = el(`chips_${b.key}`);
-      ul.innerHTML = "";
-      for (const s of (data[b.key] || [])){
-        const li = document.createElement("li");
-        li.className = "chip";
-        li.textContent = s;
-        ul.appendChild(li);
-      }
-    }
-  }
-
-  // ====== Spin + Logging ======
+  // ====== Spinner + logging ======
   function spin(){
-    const data = getBucketsFromUI();
-    const inPlay = getInPlaySeries(data);
-    if (!inPlay.length){
-      result.textContent = "—";
-      resultMeta.textContent = "No series in play. Check at least one bucket and ensure it has items.";
+    const list = inPlaySeries();
+    if (!list.length){
+      el("result").textContent = "—";
+      el("resultMeta").textContent = "No series in play. Enable at least one bucket filter that contains active series.";
       return;
     }
-    const idx = Math.floor(Math.random() * inPlay.length);
-    currentPick = inPlay[idx];
-    result.textContent = currentPick;
-    resultMeta.textContent = `Picked at ${nowISO()}`;
-    workedBtn.disabled = false;
-    skippedBtn.disabled = false;
+    const idx = Math.floor(Math.random()*list.length);
+    currentPick = list[idx];
+    el("result").textContent = seriesLabel(currentPick);
+    el("resultMeta").textContent = `Picked at ${nowISO()}`;
+    el("workedBtn").disabled = false;
+    el("skippedBtn").disabled = false;
   }
 
-  function log(outcome, series, note, source){
-    if (!series) return;
-    const history = loadHistory();
-    history.unshift({
-      at: nowISO(),
-      series,
-      outcome,   // "worked" or "skipped"
+  async function logOutcome(outcome, source, chosenSeries, note){
+    const s = chosenSeries;
+    if (!s) return;
+
+    const b = getBucketById(s.bucket_id) || {};
+    const user = (el("userLabel").value || "John").trim();
+
+    const payload = {
+      id: uuid(),
+      timestamp: nowISO(),
+      user,
+      series_id: s.series_id,
+      series_name: seriesLabel(s),
+      bucket_id: s.bucket_id,
+      bucket_name: bucketLabel(b),
+      outcome,
       note: (note || "").trim(),
-      source     // "spin" or "manual"
-    });
-    saveHistory(history);
-    renderStats();
-    renderHistory();
+      source,
+      app_version: APP_VERSION
+    };
+
+    // Optimistic local append (so offline feels fine)
+    events.push(payload);
+    saveCache(LS_EVENTS, events);
+    renderStatsAndHistory();
+
+    // Cloud append
+    try {
+      const res = await jsonp("logEvent", payload);
+      if (res && res.ok) setCloud(true, "Cloud: ok");
+      else setCloud(false, "Cloud: error");
+    } catch {
+      setCloud(false, "Cloud: offline?");
+    }
   }
 
   function logSpin(outcome){
     if (!currentPick) return;
-    log(outcome, currentPick, spinNoteInput.value, "spin");
-    spinNoteInput.value = "";
-    workedBtn.disabled = true;
-    skippedBtn.disabled = true;
+    const note = el("spinNote").value;
+    logOutcome(outcome, "spin", currentPick, note);
+    el("spinNote").value = "";
+    el("workedBtn").disabled = true;
+    el("skippedBtn").disabled = true;
     currentPick = null;
   }
 
-  function logManualWorked(){
-    const s = manualSelect.value;
-    if (!s) return;
-    log("worked", s, manualNoteInput.value, "manual");
-    manualNoteInput.value = "";
+  function logManual(){
+    const id = el("manualSelect").value;
+    const s = getSeriesById(id);
+    const note = el("manualNote").value;
+    logOutcome("worked", "manual", s, note);
+    el("manualNote").value = "";
   }
 
-  // ====== Manual Select ======
+  // ====== Rendering: manual select ======
   function renderManualSelect(){
-    const data = getBucketsFromUI();
-    const all = uniqueSeriesAllBuckets(data).sort((a,b)=>a.localeCompare(b));
-    manualSelect.innerHTML = "";
-    for (const s of all){
+    const sel = el("manualSelect");
+    const list = inPlaySeries().length ? inPlaySeries() : activeSeries().slice().sort((a,b)=>seriesLabel(a).localeCompare(seriesLabel(b)));
+    sel.innerHTML = "";
+    for (const s of list){
       const opt = document.createElement("option");
-      opt.value = s;
-      opt.textContent = s;
-      manualSelect.appendChild(opt);
+      opt.value = s.series_id;
+      opt.textContent = seriesLabel(s);
+      sel.appendChild(opt);
     }
   }
 
   // ====== Stats + History ======
-  function pct(a,b){ if (!b) return "—"; return Math.round((a/b)*100) + "%"; }
-
-  function renderStats(){
-    const data = getBucketsFromUI();
-    const allSeries = uniqueSeriesAllBuckets(data);
-    const history = loadHistory();
+  function renderStatsAndHistory(){
+    // Only compute for active series
+    const seriesMap = new Map(activeSeries().map(s => [s.series_id, s]));
 
     const stats = {};
-    for (const s of allSeries) stats[s] = { chosen: 0, worked: 0, skipped: 0 };
-
-    for (const h of history){
-      if (!stats[h.series]) continue;
-      stats[h.series].chosen += 1;
-      if (h.outcome === "worked") stats[h.series].worked += 1;
-      if (h.outcome === "skipped") stats[h.series].skipped += 1;
+    for (const [id, s] of seriesMap){
+      stats[id] = { chosen: 0, worked: 0, skipped: 0, name: seriesLabel(s) };
     }
 
-    const body = el("statsBody");
-    body.innerHTML = "";
-    for (const s of allSeries.sort((a,b)=>a.localeCompare(b))){
-      const st = stats[s];
-      const follow = st.chosen ? (st.worked / st.chosen) : 0;
-      const cls = st.chosen === 0 ? "" : (follow >= 0.6 ? "ok" : "danger");
-      const tag = st.chosen === 0 ? "new" : (follow >= 0.6 ? "stable" : "friction");
+    for (const e of (events || [])){
+      const sid = String(e.series_id || "").trim();
+      if (!stats[sid]) continue;
+      stats[sid].chosen += 1;
+      if (String(e.outcome).toLowerCase() === "worked") stats[sid].worked += 1;
+      if (String(e.outcome).toLowerCase() === "skipped") stats[sid].skipped += 1;
+    }
+
+    const rows = Object.values(stats).sort((a,b)=>a.name.localeCompare(b.name));
+    const tb = el("statsBody");
+    tb.innerHTML = "";
+
+    function pct(a,b){ return b ? Math.round((a/b)*100) + "%" : "—"; }
+
+    for (const r of rows){
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${escapeHtml(s)}</td>
-        <td>${st.chosen}</td>
-        <td>${st.worked}</td>
-        <td>${st.skipped}</td>
-        <td>${pct(st.worked, st.chosen)} <span class="pill ${cls}">${tag}</span></td>
+        <td>${escapeHtml(r.name)}</td>
+        <td>${r.chosen}</td>
+        <td>${r.worked}</td>
+        <td>${r.skipped}</td>
+        <td>${pct(r.worked, r.chosen)}</td>
       `;
-      body.appendChild(tr);
+      tb.appendChild(tr);
     }
-  }
 
-  function renderHistory(){
-    const history = loadHistory().slice(0, 30);
-    const body = el("historyBody");
-    body.innerHTML = "";
-    for (const h of history){
+    const hb = el("historyBody");
+    hb.innerHTML = "";
+    const recent = (events || []).slice(-30).reverse();
+    for (const e of recent){
       const tr = document.createElement("tr");
-      const outcomeTxt = (h.outcome === "worked") ? "✅ worked" : "⏭️ skipped";
+      const outcomeTxt = String(e.outcome).toLowerCase() === "worked" ? "✅ worked" : "⏭️ skipped";
       tr.innerHTML = `
-        <td>${escapeHtml(h.at)}</td>
-        <td>${escapeHtml(h.series)}</td>
+        <td>${escapeHtml(e.timestamp || e.at || "")}</td>
+        <td>${escapeHtml(e.series_name || e.series_id || "")}</td>
         <td>${outcomeTxt}</td>
-        <td>${escapeHtml(h.note || "")}</td>
+        <td>${escapeHtml(e.note || "")}</td>
       `;
-      body.appendChild(tr);
+      hb.appendChild(tr);
     }
   }
 
-  // ====== Export ======
-  function exportCSV(){
-    const history = loadHistory();
-    const header = ["at","series","outcome","note","source"];
-    const rows = [header.join(",")].concat(history.map(h =>
-      header.map(k => `"${String(h[k] ?? "").replace(/"/g,'""')}"`).join(",")
-    ));
-    const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "spinner-history.csv";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
+  // ====== Bucket manager UI ======
+  function renderBucketManager(){
+    const wrap = el("bucketList");
+    wrap.innerHTML = "";
+
+    for (const b of buckets.slice().sort((a,b)=>Number(a.order||999)-Number(b.order||999))){
+      const col = normalizeHex(b.color) || "#999";
+      const card = document.createElement("div");
+      card.className = "itemCard";
+
+      card.innerHTML = `
+        <div class="itemTop">
+          <div>
+            <div class="itemName">
+              <span class="tag"><span class="dot" style="background:${col}"></span><span>${escapeHtml(bucketLabel(b))}</span></span>
+            </div>
+            <div class="smallMuted">id: ${escapeHtml(b.bucket_id)}</div>
+          </div>
+          <div class="inline">
+            <button data-act="delete" style="font-weight:900;">Delete</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="grid3">
+          <div>
+            <label class="muted">Name</label>
+            <input data-k="bucket_name" value="${escapeHtml(b.bucket_name || "")}">
+          </div>
+          <div>
+            <label class="muted">Color</label>
+            <input data-k="color" value="${escapeHtml(normalizeHex(b.color) || "")}" placeholder="#C46A4A">
+          </div>
+          <div>
+            <label class="muted">Order</label>
+            <input data-k="order" value="${escapeHtml(b.order ?? "")}" inputmode="numeric">
+          </div>
+        </div>
+
+        <div class="btnRow">
+          <label class="tag" style="cursor:pointer;">
+            <input type="checkbox" data-k="active" ${toBool(b.active) ? "checked" : ""} />
+            <span>Active</span>
+          </label>
+          <button data-act="save">Save</button>
+        </div>
+      `;
+
+      const delBtn = card.querySelector('button[data-act="delete"]');
+      delBtn.addEventListener("click", async () => {
+        if (!confirm(`Delete bucket '${bucketLabel(b)}' from sheet?`)) return;
+        await jsonp("deleteBucket", { bucket_id: b.bucket_id });
+        await syncAll(true);
+      });
+
+      const saveBtn = card.querySelector('button[data-act="save"]');
+      saveBtn.addEventListener("click", async () => {
+        const name = card.querySelector('input[data-k="bucket_name"]').value.trim();
+        const color = card.querySelector('input[data-k="color"]').value.trim();
+        const order = card.querySelector('input[data-k="order"]').value.trim();
+        const active = card.querySelector('input[data-k="active"]').checked;
+
+        await jsonp("upsertBucket", {
+          bucket_id: b.bucket_id,
+          bucket_name: name,
+          color: color,
+          order: order,
+          active: active
+        });
+        await syncAll(true);
+      });
+
+      wrap.appendChild(card);
+    }
   }
 
-  function clearHistory(){
-    if (!confirm("Clear all history on this device?")) return;
-    saveHistory([]);
-    renderStats();
-    renderHistory();
+  async function addBucketFlow(){
+    const id = prompt("New bucket_id (lowercase, no spaces). Example: 'commissions'")?.trim();
+    if (!id) return;
+    const name = prompt("Bucket name (human readable).")?.trim() || id;
+    const color = prompt("Bucket color hex (e.g. #C46A4A).")?.trim() || "#999999";
+    const order = prompt("Order number (e.g. 12).")?.trim() || "99";
+
+    await jsonp("upsertBucket", { bucket_id: id, bucket_name: name, color, order, active: true });
+    await syncAll(true);
   }
 
-  function saveBuckets(){
-    const data = getBucketsFromUI();
-    saveBucketsData(data);
-    updateCounts(data);
-    renderChips(data);
-    renderManualSelect();
-    renderStats();
-    status.textContent = "Buckets saved.";
-    setTimeout(()=>status.textContent="", 1200);
+  // ====== Series manager UI ======
+  function renderSeriesManager(){
+    const wrap = el("seriesList");
+    wrap.innerHTML = "";
+
+    const bIndex = new Map(buckets.map(b => [b.bucket_id, b]));
+    const list = series
+      .slice()
+      .sort((a,b)=>seriesLabel(a).localeCompare(seriesLabel(b)));
+
+    for (const s of list){
+      const b = bIndex.get(s.bucket_id) || {};
+      const bucketCol = normalizeHex(s.color_override) || normalizeHex(b.color) || "#999";
+      const persona = (s.persona || "").trim();
+
+      const card = document.createElement("div");
+      card.className = "itemCard";
+
+      card.innerHTML = `
+        <div class="itemTop">
+          <div style="min-width:0;">
+            <div class="itemName">
+              <span class="tag"><span class="dot" style="background:${bucketCol}"></span><span>${escapeHtml(seriesLabel(s))}</span></span>
+              ${persona ? `<span class="tag" style="margin-left:8px;"><span class="dot" style="background:#888"></span><span>${escapeHtml(persona)}</span></span>` : ""}
+            </div>
+            <div class="smallMuted">id: ${escapeHtml(s.series_id)} • bucket: ${escapeHtml(s.bucket_id || "")}</div>
+          </div>
+          <div class="inline">
+            <button data-act="delete" style="font-weight:900;">Delete</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="grid2">
+          <div>
+            <label class="muted">Name</label>
+            <input data-k="series_name" value="${escapeHtml(s.series_name || "")}">
+          </div>
+          <div>
+            <label class="muted">Bucket</label>
+            <select data-k="bucket_id"></select>
+          </div>
+        </div>
+
+        <div class="grid2" style="margin-top:10px;">
+          <div>
+            <label class="muted">Color override (optional)</label>
+            <input data-k="color_override" value="${escapeHtml(normalizeHex(s.color_override) || "")}" placeholder="#D966FF">
+          </div>
+          <div>
+            <label class="muted">Persona</label>
+            <input data-k="persona" value="${escapeHtml(persona)}" placeholder="Firestone / JF / CC / CD">
+          </div>
+        </div>
+
+        <div style="margin-top:10px;">
+          <label class="muted">Description (collapsible idea text)</label>
+          <textarea data-k="description" placeholder="What this series is about…">${escapeHtml(s.description || "")}</textarea>
+        </div>
+
+        <div class="btnRow">
+          <label class="tag" style="cursor:pointer;">
+            <input type="checkbox" data-k="active" ${toBool(s.active) ? "checked" : ""} />
+            <span>Active</span>
+          </label>
+          <button data-act="save">Save</button>
+        </div>
+      `;
+
+      // bucket dropdown
+      const sel = card.querySelector('select[data-k="bucket_id"]');
+      for (const b2 of buckets.slice().sort((a,b)=>Number(a.order||999)-Number(b.order||999))){
+        const opt = document.createElement("option");
+        opt.value = b2.bucket_id;
+        opt.textContent = bucketLabel(b2);
+        if (String(b2.bucket_id) === String(s.bucket_id)) opt.selected = true;
+        sel.appendChild(opt);
+      }
+
+      const delBtn = card.querySelector('button[data-act="delete"]');
+      delBtn.addEventListener("click", async () => {
+        if (!confirm(`Delete series '${seriesLabel(s)}' from sheet?`)) return;
+        await jsonp("deleteSeries", { series_id: s.series_id });
+        await syncAll(true);
+      });
+
+      const saveBtn = card.querySelector('button[data-act="save"]');
+      saveBtn.addEventListener("click", async () => {
+        const series_name = card.querySelector('input[data-k="series_name"]').value.trim();
+        const bucket_id = card.querySelector('select[data-k="bucket_id"]').value.trim();
+        const color_override = card.querySelector('input[data-k="color_override"]').value.trim();
+        const persona2 = card.querySelector('input[data-k="persona"]').value.trim();
+        const description = card.querySelector('textarea[data-k="description"]').value;
+        const active = card.querySelector('input[data-k="active"]').checked;
+
+        await jsonp("upsertSeries", {
+          series_id: s.series_id,
+          series_name,
+          bucket_id,
+          color_override,
+          persona: persona2,
+          description,
+          active
+        });
+        await syncAll(true);
+      });
+
+      wrap.appendChild(card);
+    }
+  }
+
+  async function addSeriesFlow(){
+    const id = prompt("New series_id (lowercase, no spaces). Example: 'totem_poles'")?.trim();
+    if (!id) return;
+    const name = prompt("Series name (human readable).")?.trim() || id;
+    const bucket_id = prompt("Bucket id to start in (e.g., 'active', 'ondeck', 'lexicon').")?.trim() || "ondeck";
+    const persona = prompt("Persona (optional): Firestone / JF / CC / CD")?.trim() || "";
+    const description = prompt("Short description (optional).")?.trim() || "";
+
+    await jsonp("upsertSeries", {
+      series_id: id,
+      series_name: name,
+      bucket_id,
+      persona,
+      description,
+      active: true
+    });
+    await syncAll(true);
+  }
+
+  // ====== Sync ======
+  async function syncAll(silent=false){
+    try {
+      if (!silent) statusLine.textContent = "Syncing…";
+      const [b,s,e] = await Promise.all([
+        jsonp("getBuckets"),
+        jsonp("getSeries"),
+        jsonp("getEvents", { limit: 300 })
+      ]);
+
+      if (b?.error || s?.error || e?.error) throw new Error("API error");
+
+      buckets = (b || []).map(x => ({
+        ...x,
+        color: normalizeHex(x.color),
+        active: toBool(x.active)
+      }));
+      series = (s || []).map(x => ({
+        ...x,
+        color_override: normalizeHex(x.color_override),
+        active: toBool(x.active)
+      }));
+
+      // events from sheet (append local cache events that might not be in the last 300)
+      const sheetEvents = (e || []).map(x => ({
+        ...x,
+        timestamp: x.timestamp || x.at || "",
+      }));
+
+      const local = loadCache(LS_EVENTS, []);
+      // Merge by id to avoid dupes
+      const byId = new Map();
+      for (const ev of sheetEvents) byId.set(String(ev.id), ev);
+      for (const ev of local) {
+        const id = String(ev.id);
+        if (!byId.has(id)) byId.set(id, ev);
+      }
+      events = Array.from(byId.values()).sort((a,b)=>String(a.timestamp).localeCompare(String(b.timestamp)));
+
+      saveCache(LS_BUCKETS, buckets);
+      saveCache(LS_SERIES, series);
+      saveCache(LS_EVENTS, events);
+
+      renderFilters();
+      renderManualSelect();
+      renderBucketManager();
+      renderSeriesManager();
+      renderStatsAndHistory();
+
+      setCloud(true, "Cloud: ok");
+      statusLine.textContent = `Loaded ${buckets.length} buckets • ${series.length} series • ${events.length} events (cached)`;
+    } catch (err){
+      // offline fallback
+      buckets = loadCache(LS_BUCKETS, []);
+      series  = loadCache(LS_SERIES, []);
+      events  = loadCache(LS_EVENTS, []);
+
+      renderFilters();
+      renderManualSelect();
+      renderBucketManager();
+      renderSeriesManager();
+      renderStatsAndHistory();
+
+      setCloud(false, "Cloud: offline?");
+      statusLine.textContent = "Offline mode: using local cache. (Sync when connection returns.)";
+    }
   }
 
   // ====== Init ======
   function init(){
-    initTheme();
-
-    const saved = loadBuckets();
-    const initial = saved || {
-      active: [],
-      onDeck: [],
-      waiting: [],
-      writing: [],
-      archive: [],
-      admin: []
-    };
-    setBucketsToUI(initial);
-    updateCounts(initial);
-
-    renderBucketChecks();
-    renderChips(initial);
-    renderManualSelect();
-    renderStats();
-    renderHistory();
-
+    // theme
+    const theme = localStorage.getItem(LS_THEME) || "light";
+    applyTheme(theme);
     el("themeBtn").addEventListener("click", () => {
-      const current = localStorage.getItem(LS_THEME) || "light";
-      applyTheme(current === "dark" ? "light" : "dark");
+      const cur = localStorage.getItem(LS_THEME) || "light";
+      applyTheme(cur === "dark" ? "light" : "dark");
     });
 
-    el("saveBucketsBtn").addEventListener("click", saveBuckets);
-    el("clearHistoryBtn").addEventListener("click", clearHistory);
-    el("exportBtn").addEventListener("click", exportCSV);
+    // user label
+    el("userLabel").value = localStorage.getItem(LS_USER) || "John";
+    el("userLabel").addEventListener("input", () => localStorage.setItem(LS_USER, el("userLabel").value));
 
-    spinBtn.addEventListener("click", spin);
-    el("workedBtn").addEventListener("click", ()=> logSpin("worked"));
-    el("skippedBtn").addEventListener("click", ()=> logSpin("skipped"));
+    // buttons
+    el("syncBtn").addEventListener("click", () => syncAll(false));
+    el("spinBtn").addEventListener("click", spin);
+    el("workedBtn").addEventListener("click", () => logSpin("worked"));
+    el("skippedBtn").addEventListener("click", () => logSpin("skipped"));
+    el("manualWorkedBtn").addEventListener("click", logManual);
 
-    manualWorkedBtn.addEventListener("click", logManualWorked);
+    el("addBucketBtn").addEventListener("click", addBucketFlow);
+    el("addSeriesBtn").addEventListener("click", addSeriesFlow);
+
+    // first sync
+    setCloud(false, "Cloud: —");
+    syncAll(true);
   }
 
   init();
