@@ -168,11 +168,115 @@
     table{ width:100%; border-collapse: collapse; font-size: 14px; }
     th,td{ border-bottom:1px solid var(--border2); padding:10px 6px; text-align:left; vertical-align: top; }
 
+    /* ---- Condensed Filters (Option B) ---- */
+    .filtersBar{
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .filtersRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap: wrap;
+    }
+    .filtersChips{
+      display:flex;
+      gap:8px;
+      flex-wrap: wrap;
+      align-items:center;
+      min-width: 180px;
+    }
+    .fChip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border: 1px solid var(--border);
+      background: var(--pill);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+      user-select:none;
+      white-space: nowrap;
+    }
+    .fChip .x{
+      opacity: .75;
+      font-weight: 900;
+    }
+    .btnCompact{
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 999px;
+    }
+    .drawer{ margin-top: 10px; }
+    .drawer.is-collapsed{ display:none; }
+
+    .checkRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    label.cb{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      padding: 8px 10px;
+      border-radius: 999px;
+      cursor:pointer;
+      user-select:none;
+      font-weight: 900;
+      font-size: 12px;
+    }
+    label.cb input{ width:auto; }
+
+    /* ---- Time controls ---- */
+    .timeBar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .timeLabel{
+      font-weight: 900;
+      font-size: 13px;
+    }
+    .timeMini{
+      display:flex;
+      gap:8px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    .timeMini button{
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 999px;
+    }
+    .timeMini input{
+      width: 140px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
     @media (max-width: 760px){
       .card{ min-width: 100%; }
       .grid2{ grid-template-columns: 1fr; }
       .grid3{ grid-template-columns: 1fr; }
       .spinBtn{ width: 100%; }
+      .filtersRow{ justify-content:flex-start; }
     }
   </style>
 </head>
@@ -198,6 +302,28 @@
         <div class="tag" id="cloudTag"><span class="dot" id="cloudDot"></span><span id="cloudText">Cloud: —</span></div>
       </div>
 
+      <!-- Condensed Filters Bar -->
+      <div class="filtersBar">
+        <div class="filtersRow">
+          <div class="filtersChips" id="filtersChips"></div>
+
+          <div class="inline" style="gap:8px;">
+            <button id="clearFiltersBtn" type="button" class="btnCompact">Clear</button>
+            <button id="allFiltersBtn" type="button" class="btnCompact">All</button>
+
+            <button id="toggleFiltersBtn" type="button" class="btnCompact" aria-expanded="false">
+              Filters ▾
+            </button>
+          </div>
+        </div>
+
+        <div id="filtersDrawer" class="drawer is-collapsed">
+          <div class="divider"></div>
+          <p class="muted" style="margin:0 0 8px;">Choose which buckets are “in play” for spinning.</p>
+          <div class="checkRow" id="bucketFilters"></div>
+        </div>
+      </div>
+
       <div class="divider"></div>
 
       <div class="big" id="result">—</div>
@@ -207,6 +333,18 @@
         <button class="spinBtn" id="spinBtn">SPIN</button>
         <button id="workedBtn" disabled>Worked</button>
         <button id="skippedBtn" disabled>Skipped</button>
+      </div>
+
+      <!-- Time controls (Spin) -->
+      <div class="timeBar">
+        <div class="timeLabel" id="spinTimeLabel">Time: 0m</div>
+        <div class="timeMini">
+          <button id="spinAdd15" type="button">+15m</button>
+          <button id="spinAdd30" type="button">+30m</button>
+          <button id="spinAdd60" type="button">+1h</button>
+          <input id="spinTimeCustom" inputmode="numeric" placeholder="Custom minutes (e.g. 180)" />
+          <button id="spinTimeClear" type="button">Clear</button>
+        </div>
       </div>
 
       <div style="margin-top: 12px;">
@@ -222,16 +360,24 @@
         <button id="manualWorkedBtn">Worked</button>
       </div>
 
+      <!-- Time controls (Manual) -->
+      <div class="timeBar">
+        <div class="timeLabel" id="manualTimeLabel">Time: 0m</div>
+        <div class="timeMini">
+          <button id="manualAdd15" type="button">+15m</button>
+          <button id="manualAdd30" type="button">+30m</button>
+          <button id="manualAdd60" type="button">+1h</button>
+          <input id="manualTimeCustom" inputmode="numeric" placeholder="Custom minutes (e.g. 180)" />
+          <button id="manualTimeClear" type="button">Clear</button>
+        </div>
+      </div>
+
       <div style="margin-top: 12px;">
         <label class="muted">Optional note (manual):</label>
         <input id="manualNote" placeholder="" />
       </div>
 
       <div class="divider"></div>
-
-      <h3>Filters</h3>
-      <p class="muted">Choose which buckets are “in play” for spinning.</p>
-      <div class="grid2" id="bucketFilters"></div>
 
       <div style="margin-top: 10px;">
         <label class="muted">User label (stored locally):</label>
@@ -240,35 +386,7 @@
     </div>
   </div>
 
-  <!-- Manage + Stats -->
-  <details open>
-    <summary>Manage buckets + series</summary>
-    <p class="muted" style="margin-top:8px;">
-      These edits write back to Google Sheets (authenticated by your token).
-      Descriptions are collapsible on each series card.
-    </p>
-
-    <div class="divider"></div>
-
-    <div class="row">
-      <div class="card">
-        <h2>Buckets</h2>
-        <div class="btnRow">
-          <button id="addBucketBtn">+ Add bucket</button>
-        </div>
-        <div id="bucketList" class="grid2" style="margin-top:10px;"></div>
-      </div>
-
-      <div class="card">
-        <h2>Series</h2>
-        <div class="btnRow">
-          <button id="addSeriesBtn">+ Add series</button>
-        </div>
-        <div id="seriesList" style="margin-top:10px;"></div>
-      </div>
-    </div>
-  </details>
-
+  <!-- Stats + history (moved ABOVE manage; closed by default) -->
   <details>
     <summary>Stats + history</summary>
 
@@ -299,6 +417,7 @@
               <th>When</th>
               <th>Series</th>
               <th>Outcome</th>
+              <th>Minutes</th>
               <th>Note</th>
             </tr>
           </thead>
@@ -308,11 +427,40 @@
     </div>
   </details>
 
+  <!-- Manage buckets + series (moved BELOW stats; closed by default) -->
+  <details>
+    <summary>Manage buckets + series</summary>
+    <p class="muted" style="margin-top:8px;">
+      These edits write back to Google Sheets (authenticated by your token).
+      Descriptions are collapsible on each series card.
+    </p>
+
+    <div class="divider"></div>
+
+    <div class="row">
+      <div class="card">
+        <h2>Buckets</h2>
+        <div class="btnRow">
+          <button id="addBucketBtn">+ Add bucket</button>
+        </div>
+        <div id="bucketList" class="grid2" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="card">
+        <h2>Series</h2>
+        <div class="btnRow">
+          <button id="addSeriesBtn">+ Add series</button>
+        </div>
+        <div id="seriesList" style="margin-top:10px;"></div>
+      </div>
+    </div>
+  </details>
+
 <script>
-  // ====== CONFIG (as requested: hardcoded for now) ======
+  // ====== CONFIG (hardcoded for now) ======
   const API_URL = "https://script.google.com/macros/s/AKfycbzUyR9mpcMPGWzZT4P2XoHsba_oARB5UXm0OkjbaGmqKg3rO3-6njpRhE5YlRVwtp3n/exec";
   const API_TOKEN = "dbq2rku-QZY7cqy0bkm";
-  const APP_VERSION = "v2-sheet-sync-cards";
+  const APP_VERSION = "v3-sheet-sync-condensed-filters-time";
 
   // ====== Local cache keys ======
   const LS_THEME = "spinner_theme_v2";
@@ -346,7 +494,6 @@
   }
 
   function uuid(){
-    // decent UUIDv4 for our purposes
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
       const r = Math.random()*16|0;
       const v = c === "x" ? r : (r&0x3|0x8);
@@ -369,6 +516,19 @@
     return s.startsWith("#") ? s : ("#" + s);
   }
 
+  function asArray(maybe){
+    if (Array.isArray(maybe)) return maybe;
+    if (!maybe || typeof maybe !== "object") return [];
+    for (const k of ["data","rows","events","items","result"]){
+      if (Array.isArray(maybe[k])) return maybe[k];
+    }
+    return [];
+  }
+
+  function hasError(x){
+    return !!(x && typeof x === "object" && (x.error || x.err));
+  }
+
   // ====== JSONP (avoids CORS) ======
   function jsonp(action, params = {}) {
     return new Promise((resolve, reject) => {
@@ -377,6 +537,8 @@
         cleanup();
         reject(new Error("Timeout"));
       }, 12000);
+
+      let script = null;
 
       function cleanup(){
         clearTimeout(timeout);
@@ -396,7 +558,8 @@
         ...Object.fromEntries(Object.entries(params).map(([k,v]) => [k, String(v ?? "")]))
       });
 
-      const script = document.createElement("script");
+      script = document.createElement("script");
+      console.log("JSONP URL:", API_URL + "?" + qs.toString());
       script.src = API_URL + "?" + qs.toString();
       script.onerror = () => { cleanup(); reject(new Error("Network error")); };
       document.body.appendChild(script);
@@ -423,10 +586,13 @@
   }
 
   // ====== State ======
-  let buckets = []; // from sheet
-  let series = [];  // from sheet
-  let events = [];  // last N from sheet (plus local cache)
+  let buckets = [];
+  let series = [];
+  let events = [];
   let currentPick = null;
+
+  let spinMinutes = 0;
+  let manualMinutes = 0;
 
   function getBucketById(id){ return buckets.find(b => String(b.bucket_id).trim() === String(id).trim()); }
   function getSeriesById(id){ return series.find(s => String(s.series_id).trim() === String(id).trim()); }
@@ -444,13 +610,17 @@
     return series.filter(s => toBool(s.active) === true);
   }
 
-  // ====== Filters (in-play buckets) ======
-  function loadFilters(){
-    const f = loadCache(LS_FILTERS, null);
-    if (f && typeof f === "object") return f;
+  // ====== Filters ======
+  function defaultFilters(){
     const obj = {};
     for (const b of activeBuckets()) obj[b.bucket_id] = true;
     return obj;
+  }
+
+  function loadFilters(){
+    const f = loadCache(LS_FILTERS, null);
+    if (f && typeof f === "object") return f;
+    return defaultFilters();
   }
 
   function saveFilters(f){ saveCache(LS_FILTERS, f); }
@@ -465,7 +635,47 @@
     return Array.from(set.values()).sort((a,b)=>seriesLabel(a).localeCompare(seriesLabel(b)));
   }
 
-  function renderFilters(){
+  function refreshInPlayTag(){
+    const list = inPlaySeries();
+    el("inPlayTag").querySelector("span:last-child").textContent = `In play: ${list.length}`;
+  }
+
+  function renderFilterChips(){
+    const f = loadFilters();
+    const wrap = el("filtersChips");
+    wrap.innerHTML = "";
+
+    const act = activeBuckets();
+    const selected = act.filter(b => !!f[b.bucket_id]);
+
+    if (!selected.length){
+      const empty = document.createElement("span");
+      empty.className = "muted";
+      empty.textContent = "No buckets selected.";
+      wrap.appendChild(empty);
+      return;
+    }
+
+    for (const b of selected){
+      const col = normalizeHex(b.color) || "#999";
+      const chip = document.createElement("span");
+      chip.className = "fChip";
+      chip.title = "Click to remove from in-play";
+      chip.innerHTML = `<span class="dot" style="background:${col}"></span><span>${escapeHtml(bucketLabel(b))}</span><span class="x">×</span>`;
+      chip.addEventListener("click", () => {
+        const next = loadFilters();
+        next[b.bucket_id] = false;
+        saveFilters(next);
+        renderFiltersDrawer();
+        renderFilterChips();
+        refreshInPlayTag();
+        renderManualSelect();
+      });
+      wrap.appendChild(chip);
+    }
+  }
+
+  function renderFiltersDrawer(){
     const f = loadFilters();
     const wrap = el("bucketFilters");
     wrap.innerHTML = "";
@@ -473,31 +683,88 @@
     for (const b of activeBuckets()){
       const id = b.bucket_id;
       const col = normalizeHex(b.color) || "#999";
-      const card = document.createElement("label");
-      card.className = "itemCard";
-      card.style.cursor = "pointer";
-      card.innerHTML = `
-        <div class="inline" style="justify-content:space-between;">
-          <div class="tag"><span class="dot" style="background:${col}"></span><span>${escapeHtml(bucketLabel(b))}</span></div>
-          <input type="checkbox" ${f[id] ? "checked" : ""} />
-        </div>
-        <div class="smallMuted">${escapeHtml(id)}</div>
+
+      const lab = document.createElement("label");
+      lab.className = "cb";
+      lab.innerHTML = `
+        <input type="checkbox" ${f[id] ? "checked" : ""} />
+        <span class="dot" style="background:${col}"></span>
+        <span>${escapeHtml(bucketLabel(b))}</span>
       `;
-      const cb = card.querySelector("input");
+      const cb = lab.querySelector("input");
       cb.addEventListener("change", () => {
         const next = loadFilters();
         next[id] = cb.checked;
         saveFilters(next);
+        renderFilterChips();
         refreshInPlayTag();
+        renderManualSelect();
       });
-      wrap.appendChild(card);
+
+      wrap.appendChild(lab);
     }
+
+    renderFilterChips();
     refreshInPlayTag();
   }
 
-  function refreshInPlayTag(){
-    const list = inPlaySeries();
-    el("inPlayTag").querySelector("span:last-child").textContent = `In play: ${list.length}`;
+  function setAllFilters(value){
+    const next = loadFilters();
+    for (const b of activeBuckets()) next[b.bucket_id] = value;
+    saveFilters(next);
+    renderFiltersDrawer();
+    renderManualSelect();
+  }
+
+  function toggleFiltersDrawer(){
+    const drawer = el("filtersDrawer");
+    const btn = el("toggleFiltersBtn");
+    const isCollapsed = drawer.classList.contains("is-collapsed");
+    drawer.classList.toggle("is-collapsed", !isCollapsed ? true : false);
+    const nowOpen = isCollapsed;
+    btn.setAttribute("aria-expanded", nowOpen ? "true" : "false");
+    btn.textContent = nowOpen ? "Filters ▴" : "Filters ▾";
+  }
+
+  // ====== Time controls ======
+  function clampMinutes(n){
+    const x = Number(n);
+    if (!Number.isFinite(x)) return 0;
+    return Math.max(0, Math.min(24*60, Math.round(x)));
+  }
+
+  function updateTimeLabels(){
+    el("spinTimeLabel").textContent = `Time: ${spinMinutes}m`;
+    el("manualTimeLabel").textContent = `Time: ${manualMinutes}m`;
+  }
+
+  function wireTimeControls(prefix){
+    const add15 = el(prefix + "Add15");
+    const add30 = el(prefix + "Add30");
+    const add60 = el(prefix + "Add60");
+    const custom = el(prefix + "TimeCustom");
+    const clear = el(prefix + "TimeClear");
+
+    function getVal(){
+      return prefix === "spin" ? spinMinutes : manualMinutes;
+    }
+    function setVal(v){
+      if (prefix === "spin") spinMinutes = clampMinutes(v);
+      else manualMinutes = clampMinutes(v);
+      updateTimeLabels();
+    }
+
+    add15.addEventListener("click", () => setVal(getVal() + 15));
+    add30.addEventListener("click", () => setVal(getVal() + 30));
+    add60.addEventListener("click", () => setVal(getVal() + 60));
+
+    custom.addEventListener("change", () => {
+      const v = clampMinutes(custom.value);
+      setVal(v);
+      custom.value = "";
+    });
+
+    clear.addEventListener("click", () => setVal(0));
   }
 
   // ====== Spinner + logging ======
@@ -516,7 +783,7 @@
     el("skippedBtn").disabled = false;
   }
 
-  async function logOutcome(outcome, source, chosenSeries, note){
+  async function logOutcome(outcome, source, chosenSeries, note, minutes){
     const s = chosenSeries;
     if (!s) return;
 
@@ -532,12 +799,13 @@
       bucket_id: s.bucket_id,
       bucket_name: bucketLabel(b),
       outcome,
+      minutes: clampMinutes(minutes || 0),
       note: (note || "").trim(),
       source,
       app_version: APP_VERSION
     };
 
-    // Optimistic local append (so offline feels fine)
+    // Optimistic local append
     events.push(payload);
     saveCache(LS_EVENTS, events);
     renderStatsAndHistory();
@@ -545,8 +813,9 @@
     // Cloud append
     try {
       const res = await jsonp("logEvent", payload);
-      if (res && res.ok) setCloud(true, "Cloud: ok");
-      else setCloud(false, "Cloud: error");
+      if (res && (res.ok === true || res.success === true)) setCloud(true, "Cloud: ok");
+      else if (hasError(res)) setCloud(false, "Cloud: error");
+      else setCloud(true, "Cloud: ok");
     } catch {
       setCloud(false, "Cloud: offline?");
     }
@@ -555,19 +824,23 @@
   function logSpin(outcome){
     if (!currentPick) return;
     const note = el("spinNote").value;
-    logOutcome(outcome, "spin", currentPick, note);
+    logOutcome(outcome, "spin", currentPick, note, spinMinutes);
     el("spinNote").value = "";
     el("workedBtn").disabled = true;
     el("skippedBtn").disabled = true;
     currentPick = null;
+    spinMinutes = 0;
+    updateTimeLabels();
   }
 
   function logManual(){
     const id = el("manualSelect").value;
     const s = getSeriesById(id);
     const note = el("manualNote").value;
-    logOutcome("worked", "manual", s, note);
+    logOutcome("worked", "manual", s, note, manualMinutes);
     el("manualNote").value = "";
+    manualMinutes = 0;
+    updateTimeLabels();
   }
 
   // ====== Rendering: manual select ======
@@ -585,8 +858,7 @@
 
   // ====== Stats + History ======
   function renderStatsAndHistory(){
-    // Only compute for active series
-    const seriesMap = new Map(activeSeries().map(s => [s.series_id, s]));
+    const seriesMap = new Map(activeSeries().map(s => [String(s.series_id).trim(), s]));
 
     const stats = {};
     for (const [id, s] of seriesMap){
@@ -629,6 +901,7 @@
         <td>${escapeHtml(e.timestamp || e.at || "")}</td>
         <td>${escapeHtml(e.series_name || e.series_id || "")}</td>
         <td>${outcomeTxt}</td>
+        <td>${escapeHtml((e.minutes ?? "") === "" ? "" : String(e.minutes))}</td>
         <td>${escapeHtml(e.note || "")}</td>
       `;
       hb.appendChild(tr);
@@ -854,64 +1127,73 @@
     await syncAll(true);
   }
 
-  // ====== Sync ======
+
+
+  // NOTE: Your full bucket/series manager code is unchanged in behavior.
+  // If you want it verbatim re-inserted here, paste your current baseline’s
+  // renderBucketManager/renderSeriesManager/addBucketFlow/addSeriesFlow blocks.
+
   async function syncAll(silent=false){
     try {
       if (!silent) statusLine.textContent = "Syncing…";
-      const [b,s,e] = await Promise.all([
+
+      const [bRaw,sRaw,eRaw] = await Promise.all([
         jsonp("getBuckets"),
         jsonp("getSeries"),
-        jsonp("getEvents", { limit: 300 })
+        jsonp("getEvents", { limit: 2000 })
       ]);
 
-      if (b?.error || s?.error || e?.error) throw new Error("API error");
+      if (hasError(bRaw) || hasError(sRaw) || hasError(eRaw)) throw new Error("API error");
 
-      buckets = (b || []).map(x => ({
-        ...x,
-        color: normalizeHex(x.color),
-        active: toBool(x.active)
-      }));
-      series = (s || []).map(x => ({
-        ...x,
-        color_override: normalizeHex(x.color_override),
-        active: toBool(x.active)
-      }));
+      const bArr = asArray(bRaw);
+      const sArr = asArray(sRaw);
+      const eArr = asArray(eRaw);
 
-      // events from sheet (append local cache events that might not be in the last 300)
-      const sheetEvents = (e || []).map(x => ({
+      buckets = bArr.map(x => ({ ...x, color: normalizeHex(x.color), active: toBool(x.active) }));
+      series  = sArr.map(x => ({ ...x, color_override: normalizeHex(x.color_override), active: toBool(x.active) }));
+
+      const sheetEvents = eArr.map(x => ({
         ...x,
         timestamp: x.timestamp || x.at || "",
+        minutes: (x.minutes === "" || x.minutes === undefined || x.minutes === null) ? "" : Number(x.minutes)
       }));
 
       const local = loadCache(LS_EVENTS, []);
-      // Merge by id to avoid dupes
       const byId = new Map();
       for (const ev of sheetEvents) byId.set(String(ev.id), ev);
-      for (const ev of local) {
-        const id = String(ev.id);
-        if (!byId.has(id)) byId.set(id, ev);
-      }
+      for (const ev of local) if (!byId.has(String(ev.id))) byId.set(String(ev.id), ev);
+
       events = Array.from(byId.values()).sort((a,b)=>String(a.timestamp).localeCompare(String(b.timestamp)));
 
       saveCache(LS_BUCKETS, buckets);
       saveCache(LS_SERIES, series);
       saveCache(LS_EVENTS, events);
 
-      renderFilters();
+      // Keep filters sane if new buckets appear
+      const f = loadFilters();
+      let changed = false;
+      for (const b of activeBuckets()){
+        if (f[b.bucket_id] === undefined){
+          f[b.bucket_id] = true;
+          changed = true;
+        }
+      }
+      if (changed) saveFilters(f);
+
+      renderFiltersDrawer();
       renderManualSelect();
       renderBucketManager();
       renderSeriesManager();
       renderStatsAndHistory();
 
       setCloud(true, "Cloud: ok");
-      statusLine.textContent = `Loaded ${buckets.length} buckets • ${series.length} series • ${events.length} events (cached)`;
+      statusLine.textContent = `Loaded ${buckets.length} buckets • ${series.length} series • ${events.length} events (sheet returned ${sheetEvents.length})`;
     } catch (err){
-      // offline fallback
       buckets = loadCache(LS_BUCKETS, []);
       series  = loadCache(LS_SERIES, []);
       events  = loadCache(LS_EVENTS, []);
 
-      renderFilters();
+      renderFiltersDrawer();
       renderManualSelect();
       renderBucketManager();
       renderSeriesManager();
@@ -922,9 +1204,7 @@
     }
   }
 
-  // ====== Init ======
   function init(){
-    // theme
     const theme = localStorage.getItem(LS_THEME) || "light";
     applyTheme(theme);
     el("themeBtn").addEventListener("click", () => {
@@ -936,17 +1216,25 @@
     el("userLabel").value = localStorage.getItem(LS_USER) || "John";
     el("userLabel").addEventListener("input", () => localStorage.setItem(LS_USER, el("userLabel").value));
 
+    // filters drawer wiring
+    el("toggleFiltersBtn").addEventListener("click", toggleFiltersDrawer);
+    el("clearFiltersBtn").addEventListener("click", () => setAllFilters(false));
+    el("allFiltersBtn").addEventListener("click", () => setAllFilters(true));
+
+    // time controls wiring
+    wireTimeControls("spin");
+    wireTimeControls("manual");
+    updateTimeLabels();
+
     // buttons
     el("syncBtn").addEventListener("click", () => syncAll(false));
     el("spinBtn").addEventListener("click", spin);
     el("workedBtn").addEventListener("click", () => logSpin("worked"));
     el("skippedBtn").addEventListener("click", () => logSpin("skipped"));
     el("manualWorkedBtn").addEventListener("click", logManual);
-
     el("addBucketBtn").addEventListener("click", addBucketFlow);
     el("addSeriesBtn").addEventListener("click", addSeriesFlow);
 
-    // first sync
     setCloud(false, "Cloud: —");
     syncAll(true);
   }
