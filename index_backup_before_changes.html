@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Studio Spinner + Energy Tracker</title>
+
+  <style>
+    :root{
+      --bg: #ffffff;
+      --card: #ffffff;
+      --text: #111111;
+      --muted: #666666;
+      --border: #dddddd;
+      --border2: #eeeeee;
+      --btn: #f2f2f2;
+      --btnText: #111111;
+      --pill: #f8f8f8;
+      --shadow: rgba(0,0,0,0.06);
+      --danger: #e26;
+      --ok: #2a6;
+      --focus: rgba(80,140,255,0.35);
+    }
+
+    [data-theme="dark"]{
+      --bg: #2b2d31;        /* dark gray, not black */
+      --card: #343741;
+      --text: #f2f2f2;
+      --muted: #b6bcc6;
+      --border: #4a4f5a;
+      --border2: #3e424b;
+      --btn: #404552;
+      --btnText: #f2f2f2;
+      --pill: #3a3f4a;
+      --shadow: rgba(0,0,0,0.25);
+      --danger: #ff5aa5;
+      --ok: #49d17d;
+      --focus: rgba(130,180,255,0.35);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      margin: 18px;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 1020px;
+    }
+
+    h1 { font-size: 20px; margin: 0 0 10px; }
+    h2 { font-size: 16px; margin: 0 0 8px; }
+    .muted { color: var(--muted); font-size: 13px; line-height: 1.35; }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .row { display: flex; gap: 14px; flex-wrap: wrap; }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      flex: 1;
+      min-width: 320px;
+      background: var(--card);
+      box-shadow: 0 2px 10px var(--shadow);
+    }
+
+    textarea, input, select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+    textarea:focus, input:focus, select:focus { box-shadow: 0 0 0 4px var(--focus); border-color: transparent; }
+
+    textarea { height: 180px; }
+
+    button {
+      padding: 12px 12px;
+      cursor: pointer;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--btn);
+      color: var(--btnText);
+      font-weight: 600;
+      touch-action: manipulation;
+    }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btnRow { display:flex; gap:10px; flex-wrap: wrap; margin-top: 10px; }
+
+    .big { font-size: 28px; font-weight: 800; margin: 8px 0; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { border-bottom: 1px solid var(--border2); padding: 10px 6px; text-align: left; vertical-align: top; }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border: 1px solid var(--border);
+      background: var(--pill);
+      border-radius: 999px;
+      font-size: 12px;
+      margin-left: 6px;
+    }
+    .pill.danger { border-color: var(--danger); }
+    .pill.ok { border-color: var(--ok); }
+
+    .bucketGrid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .bucketBox{
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      background: var(--bg);
+    }
+    .bucketTitle{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+    .seriesList{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .chip{
+      border: 1px solid var(--border);
+      background: var(--pill);
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .chip:active{ transform: scale(0.98); }
+
+    .inline{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap: wrap;
+    }
+    .checkRow{
+      display:flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    label.cb{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      padding: 8px 10px;
+      border-radius: 12px;
+      cursor:pointer;
+      user-select:none;
+    }
+    label.cb input{ width:auto; }
+
+    .divider{ height: 1px; background: var(--border2); margin: 12px 0; }
+
+    /* Mobile friendliness */
+    @media (max-width: 720px){
+      body{ margin: 12px; }
+      .card{ min-width: 100%; }
+      .bucketGrid{ grid-template-columns: 1fr; }
+      textarea{ height: 160px; }
+      .big{ font-size: 26px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <!-- CHANGE THIS LINE for your second version -->
+    <h1 id="appTitle">Studio Spinner + Energy Tracker</h1>
+
+    <div class="inline">
+      <button id="themeBtn" title="Toggle Light/Dark">Dark Mode</button>
+    </div>
+  </div>
+
+  <p class="muted">
+    Buckets hold your series. Choose which buckets are “in play,” then spin — or log manually without spinning.
+    Data is stored locally on this device.
+  </p>
+
+  <div class="row">
+    <div class="card">
+      <h2>Buckets</h2>
+      <p class="muted">Paste series names into any bucket (one per line), then Save.</p>
+
+      <div class="bucketGrid">
+        <div class="bucketBox">
+          <div class="bucketTitle"><span>Active Series</span><span class="muted" id="count_active">0</span></div>
+          <textarea id="ta_active" placeholder="Belly Series&#10;Slats"></textarea>
+        </div>
+
+        <div class="bucketBox">
+          <div class="bucketTitle"><span>On Deck</span><span class="muted" id="count_onDeck">0</span></div>
+          <textarea id="ta_onDeck" placeholder="Pressed Landscapes"></textarea>
+        </div>
+
+        <div class="bucketBox">
+          <div class="bucketTitle"><span>Waiting</span><span class="muted" id="count_waiting">0</span></div>
+          <textarea id="ta_waiting" placeholder="Needs materials / drying / research"></textarea>
+        </div>
+
+        <div class="bucketBox">
+          <div class="bucketTitle"><span>Archive</span><span class="muted" id="count_archive">0</span></div>
+          <textarea id="ta_archive" placeholder="Completed / paused long-term"></textarea>
+        </div>
+
+        <div class="bucketBox">
+          <div class="bucketTitle"><span>Admin</span><span class="muted" id="count_admin">0</span></div>
+          <textarea id="ta_admin" placeholder="Framing, packaging, website, inventory"></textarea>
+        </div>
+      </div>
+
+      <div class="btnRow">
+        <button id="saveBucketsBtn">Save buckets</button>
+        <button id="clearHistoryBtn">Clear history</button>
+        <button id="exportBtn">Export history (CSV)</button>
+      </div>
+
+      <p class="muted" id="status"></p>
+
+      <div class="divider"></div>
+
+      <h2>Move a series (quick)</h2>
+      <p class="muted">Tap a chip below to move it to another bucket.</p>
+      <div class="inline">
+        <select id="moveToSelect" style="max-width: 240px;">
+          <option value="active">Move to: Active Series</option>
+          <option value="onDeck">Move to: On Deck</option>
+          <option value="waiting">Move to: Waiting</option>
+          <option value="archive">Move to: Archive</option>
+          <option value="admin">Move to: Admin</option>
+        </select>
+        <span class="muted" id="moveHint">Tap a series chip to move it.</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <h2>Series chips</h2>
+      <div class="bucketGrid">
+        <div class="bucketBox">
+          <div class="bucketTitle"><span>Active</span></div>
+          <ul class="seriesList" id="chips_active"></ul>
+        </div>
+        <div class="bucketBox">
+          <div class="bucketTitle"><span>On Deck</span></div>
+          <ul class="seriesList" id="chips_onDeck"></ul>
+        </div>
+        <div class="bucketBox">
+          <div class="bucketTitle"><span>Waiting</span></div>
+          <ul class="seriesList" id="chips_waiting"></ul>
+        </div>
+        <div class="bucketBox">
+          <div class="bucketTitle"><span>Archive</span></div>
+          <ul class="seriesList" id="chips_archive"></ul>
+        </div>
+        <div class="bucketBox">
+          <div class="bucketTitle"><span>Admin</span></div>
+          <ul class="seriesList" id="chips_admin"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Pick what’s “in play” for the spinner</h2>
+      <div class="checkRow" id="bucketChecks"></div>
+
+      <div class="divider"></div>
+
+      <h2>Spin result</h2>
+      <div class="big" id="result">—</div>
+      <div class="muted" id="resultMeta">Spin to get a suggestion, or log manually.</div>
+
+      <div class="btnRow">
+        <button id="spinBtn">Spin</button>
+        <button id="workedBtn" disabled>Worked</button>
+        <button id="skippedBtn" disabled>Skipped</button>
+      </div>
+
+      <div style="margin-top: 12px;">
+        <label class="muted">Optional note (e.g., “45m underpainting”):</label>
+        <input id="noteInput" placeholder="" />
+      </div>
+
+      <div class="divider"></div>
+
+      <h2>Manual log (no spin)</h2>
+      <p class="muted">Choose the series yourself and log it. Useful when you already know what you’re doing.</p>
+      <div class="inline">
+        <select id="manualSelect"></select>
+        <button id="manualWorkedBtn">Worked</button>
+        <button id="manualSkippedBtn">Skipped</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:14px;">
+    <div class="card">
+      <h2>Energy stats</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Series</th>
+            <th>Chosen</th>
+            <th>Worked</th>
+            <th>Skipped</th>
+            <th>Follow-through</th>
+          </tr>
+        </thead>
+        <tbody id="statsBody"></tbody>
+      </table>
+      <p class="muted">Low follow-through usually means “next action is too big” or “wrong bucket right now.”</p>
+    </div>
+
+    <div class="card">
+      <h2>Recent history</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>Series</th>
+            <th>Outcome</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  // ====== Storage Keys (device-local) ======
+  const LS_THEME   = "spinner_theme_v1";
+  const LS_BUCKETS = "spinner_buckets_v2";
+  const LS_HISTORY = "spinner_history_v2";
+  const LS_BUCKET_SELECTION = "spinner_bucket_selection_v1";
+
+  // ====== Bucket Definitions ======
+  const BUCKETS = [
+    { key: "active",  label: "Active Series" },
+    { key: "onDeck",  label: "On Deck" },
+    { key: "waiting", label: "Waiting" },
+    { key: "archive", label: "Archive" },
+    { key: "admin",   label: "Admin" }
+  ];
+
+  const el = (id) => document.getElementById(id);
+  const status = el("status");
+  const result = el("result");
+  const resultMeta = el("resultMeta");
+  const noteInput = el("noteInput");
+
+  const workedBtn = el("workedBtn");
+  const skippedBtn = el("skippedBtn");
+  const spinBtn = el("spinBtn");
+
+  const manualSelect = el("manualSelect");
+  const manualWorkedBtn = el("manualWorkedBtn");
+  const manualSkippedBtn = el("manualSkippedBtn");
+
+  let currentPick = null;
+
+  function nowISO(){
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function splitLines(text){
+    return text.split("\n").map(s => s.trim()).filter(Boolean);
+  }
+
+  function joinLines(list){
+    return (list || []).join("\n");
+  }
+
+  function loadBuckets(){
+    try {
+      const raw = localStorage.getItem(LS_BUCKETS);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
+  function saveBucketsData(data){
+    localStorage.setItem(LS_BUCKETS, JSON.stringify(data));
+  }
+
+  function getBucketsFromUI(){
+    const data = {};
+    for (const b of BUCKETS){
+      data[b.key] = splitLines(el(`ta_${b.key}`).value);
+    }
+    return data;
+  }
+
+  function setBucketsToUI(data){
+    for (const b of BUCKETS){
+      el(`ta_${b.key}`).value = joinLines((data && data[b.key]) || []);
+    }
+  }
+
+  function loadHistory(){
+    try { return JSON.parse(localStorage.getItem(LS_HISTORY) || "[]"); }
+    catch { return []; }
+  }
+
+  function saveHistory(history){
+    localStorage.setItem(LS_HISTORY, JSON.stringify(history));
+  }
+
+  function uniqueSeriesAllBuckets(data){
+    const set = new Set();
+    for (const b of BUCKETS){
+      for (const s of (data[b.key] || [])) set.add(s);
+    }
+    return Array.from(set);
+  }
+
+  function updateCounts(data){
+    for (const b of BUCKETS){
+      el(`count_${b.key}`).textContent = (data[b.key] || []).length;
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (m) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+    }[m]));
+  }
+
+  // ====== Theme ======
+  function applyTheme(theme){
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem(LS_THEME, theme);
+    el("themeBtn").textContent = (theme === "dark") ? "Light Mode" : "Dark Mode";
+  }
+  function initTheme(){
+    const saved = localStorage.getItem(LS_THEME) || "light";
+    applyTheme(saved);
+  }
+
+  // ====== Bucket selection for spinner ======
+  function defaultBucketSelection(){
+    const obj = {};
+    for (const b of BUCKETS) obj[b.key] = true; // default: all in play
+    return obj;
+  }
+
+  function loadBucketSelection(){
+    try {
+      const raw = localStorage.getItem(LS_BUCKET_SELECTION);
+      if (!raw) return defaultBucketSelection();
+      const parsed = JSON.parse(raw);
+      // ensure all keys exist
+      const base = defaultBucketSelection();
+      for (const k in base) base[k] = (parsed[k] !== undefined) ? !!parsed[k] : base[k];
+      return base;
+    } catch {
+      return defaultBucketSelection();
+    }
+  }
+
+  function saveBucketSelection(sel){
+    localStorage.setItem(LS_BUCKET_SELECTION, JSON.stringify(sel));
+  }
+
+  function renderBucketChecks(){
+    const container = el("bucketChecks");
+    container.innerHTML = "";
+    const sel = loadBucketSelection();
+
+    for (const b of BUCKETS){
+      const lab = document.createElement("label");
+      lab.className = "cb";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = !!sel[b.key];
+      cb.addEventListener("change", () => {
+        const current = loadBucketSelection();
+        current[b.key] = cb.checked;
+        saveBucketSelection(current);
+        renderManualSelect(); // keep manual list current if you want it bucket-filtered later
+      });
+      lab.appendChild(cb);
+      const span = document.createElement("span");
+      span.textContent = b.label;
+      lab.appendChild(span);
+      container.appendChild(lab);
+    }
+  }
+
+  function getInPlaySeries(data){
+    const sel = loadBucketSelection();
+    const set = new Set();
+    for (const b of BUCKETS){
+      if (!sel[b.key]) continue;
+      for (const s of (data[b.key] || [])) set.add(s);
+    }
+    return Array.from(set);
+  }
+
+  // ====== Chips + Move ======
+  function renderChips(data){
+    for (const b of BUCKETS){
+      const ul = el(`chips_${b.key}`);
+      ul.innerHTML = "";
+      for (const s of (data[b.key] || [])){
+        const li = document.createElement("li");
+        li.className = "chip";
+        li.textContent = s;
+        li.addEventListener("click", () => moveSeries(s, b.key));
+        ul.appendChild(li);
+      }
+    }
+  }
+
+  function removeFromAllBuckets(data, series){
+    for (const b of BUCKETS){
+      data[b.key] = (data[b.key] || []).filter(x => x !== series);
+    }
+  }
+
+  function moveSeries(series, fromBucket){
+    const data = getBucketsFromUI();
+    const to = el("moveToSelect").value;
+    if (to === fromBucket){
+      el("moveHint").textContent = `Already in ${bucketLabel(to)}.`;
+      setTimeout(() => el("moveHint").textContent = "Tap a series chip to move it.", 1200);
+      return;
+    }
+    removeFromAllBuckets(data, series);
+    data[to] = data[to] || [];
+    data[to].push(series);
+
+    // Write back
+    setBucketsToUI(data);
+    saveBucketsData(data);
+    updateCounts(data);
+    renderChips(data);
+    renderManualSelect();
+
+    el("moveHint").textContent = `Moved “${series}” → ${bucketLabel(to)}.`;
+    setTimeout(() => el("moveHint").textContent = "Tap a series chip to move it.", 1600);
+  }
+
+  function bucketLabel(key){
+    return (BUCKETS.find(b => b.key === key) || {}).label || key;
+  }
+
+  // ====== Spin + Logging ======
+  function spin(){
+    const data = getBucketsFromUI();
+    const inPlay = getInPlaySeries(data);
+    if (!inPlay.length){
+      result.textContent = "—";
+      resultMeta.textContent = "No series in play. Check at least one bucket and ensure it has items.";
+      return;
+    }
+    const idx = Math.floor(Math.random() * inPlay.length);
+    currentPick = inPlay[idx];
+    result.textContent = currentPick;
+    resultMeta.textContent = `Picked at ${nowISO()}`;
+    workedBtn.disabled = false;
+    skippedBtn.disabled = false;
+  }
+
+  function log(outcome, seriesOverride=null){
+    const series = seriesOverride || currentPick;
+    if (!series) return;
+
+    const history = loadHistory();
+    history.unshift({
+      at: nowISO(),
+      series,
+      outcome,           // "worked" or "skipped"
+      note: (noteInput.value || "").trim(),
+      source: seriesOverride ? "manual" : "spin"
+    });
+    saveHistory(history);
+
+    // reset spin state
+    if (!seriesOverride){
+      noteInput.value = "";
+      workedBtn.disabled = true;
+      skippedBtn.disabled = true;
+      currentPick = null;
+    } else {
+      // manual log still uses same note field
+      noteInput.value = "";
+    }
+
+    renderStats();
+    renderHistory();
+  }
+
+  // ====== Manual Select ======
+  function renderManualSelect(){
+    const data = getBucketsFromUI();
+    const all = uniqueSeriesAllBuckets(data).sort((a,b) => a.localeCompare(b));
+    manualSelect.innerHTML = "";
+    for (const s of all){
+      const opt = document.createElement("option");
+      opt.value = s;
+      opt.textContent = s;
+      manualSelect.appendChild(opt);
+    }
+  }
+
+  // ====== Stats + History ======
+  function pct(a,b){ if (!b) return "—"; return Math.round((a/b)*100) + "%"; }
+
+  function renderStats(){
+    const data = getBucketsFromUI();
+    const allSeries = uniqueSeriesAllBuckets(data);
+    const history = loadHistory();
+
+    const stats = {};
+    for (const s of allSeries) stats[s] = { chosen: 0, worked: 0, skipped: 0 };
+
+    for (const h of history){
+      if (!stats[h.series]) continue;
+      stats[h.series].chosen += 1;
+      if (h.outcome === "worked") stats[h.series].worked += 1;
+      if (h.outcome === "skipped") stats[h.series].skipped += 1;
+    }
+
+    const body = el("statsBody");
+    body.innerHTML = "";
+    for (const s of allSeries.sort((a,b)=>a.localeCompare(b))){
+      const st = stats[s];
+      const follow = st.chosen ? (st.worked / st.chosen) : 0;
+      const cls = st.chosen === 0 ? "" : (follow >= 0.6 ? "ok" : "danger");
+      const tag = st.chosen === 0 ? "new" : (follow >= 0.6 ? "stable" : "friction");
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${escapeHtml(s)}</td>
+        <td>${st.chosen}</td>
+        <td>${st.worked}</td>
+        <td>${st.skipped}</td>
+        <td>${pct(st.worked, st.chosen)} <span class="pill ${cls}">${tag}</span></td>
+      `;
+      body.appendChild(tr);
+    }
+  }
+
+  function renderHistory(){
+    const history = loadHistory().slice(0, 30);
+    const body = el("historyBody");
+    body.innerHTML = "";
+    for (const h of history){
+      const tr = document.createElement("tr");
+      const outcomeTxt = (h.outcome === "worked") ? "✅ worked" : "⏭️ skipped";
+      const note = h.note || "";
+      tr.innerHTML = `
+        <td>${escapeHtml(h.at)}</td>
+        <td>${escapeHtml(h.series)}</td>
+        <td>${outcomeTxt}</td>
+        <td>${escapeHtml(note)}</td>
+      `;
+      body.appendChild(tr);
+    }
+  }
+
+  // ====== Export ======
+  function exportCSV(){
+    const history = loadHistory();
+    const header = ["at","series","outcome","note","source"];
+    const rows = [header.join(",")].concat(history.map(h =>
+      header.map(k => `"${String(h[k] ?? "").replace(/"/g,'""')}"`).join(",")
+    ));
+    const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "spinner-history.csv";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // ====== Clear history ======
+  function clearHistory(){
+    if (!confirm("Clear all history on this device?")) return;
+    saveHistory([]);
+    renderStats();
+    renderHistory();
+  }
+
+  // ====== Save buckets ======
+  function saveBuckets(){
+    const data = getBucketsFromUI();
+    saveBucketsData(data);
+    updateCounts(data);
+    renderChips(data);
+    renderManualSelect();
+    renderStats();
+    status.textContent = "Buckets saved.";
+    setTimeout(()=>status.textContent="", 1200);
+  }
+
+  // ====== Init ======
+  function init(){
+    initTheme();
+
+    // Load saved buckets
+    const saved = loadBuckets();
+    const initial = saved || {
+      active: [],
+      onDeck: [],
+      waiting: [],
+      archive: [],
+      admin: []
+    };
+    setBucketsToUI(initial);
+    updateCounts(initial);
+
+    renderBucketChecks();
+    renderChips(initial);
+    renderManualSelect();
+    renderStats();
+    renderHistory();
+
+    el("themeBtn").addEventListener("click", () => {
+      const current = localStorage.getItem(LS_THEME) || "light";
+      applyTheme(current === "dark" ? "light" : "dark");
+    });
+
+    el("saveBucketsBtn").addEventListener("click", saveBuckets);
+    el("clearHistoryBtn").addEventListener("click", clearHistory);
+    el("exportBtn").addEventListener("click", exportCSV);
+
+    spinBtn.addEventListener("click", spin);
+    workedBtn.addEventListener("click", ()=> log("worked"));
+    skippedBtn.addEventListener("click", ()=> log("skipped"));
+
+    manualWorkedBtn.addEventListener("click", ()=> {
+      const s = manualSelect.value;
+      if (!s) return;
+      log("worked", s);
+    });
+    manualSkippedBtn.addEventListener("click", ()=> {
+      const s = manualSelect.value;
+      if (!s) return;
+      log("skipped", s);
+    });
+  }
+
+  init();
+</script>
+</body>
+</html>
