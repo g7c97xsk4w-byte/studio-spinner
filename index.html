@@ -2,1244 +2,1072 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Studio Spinner + Energy Tracker</title>
-
   <style>
     :root{
-      --bg:#ffffff; --card:#ffffff; --text:#111; --muted:#666;
-      --border:#ddd; --border2:#eee; --shadow:rgba(0,0,0,.07);
-      --btn:#f2f2f2; --btnText:#111; --pill:#f7f7f7;
-      --focus:rgba(80,140,255,.35);
+      --bg:#0f1115; --panel:#171a21; --panel2:#1e2330; --text:#e9ecf1; --muted:#a9b0bc;
+      --line:rgba(255,255,255,.10); --chip:rgba(255,255,255,.08); --btn:#2a3246;
+      --ok:#49d17d; --bad:#ff5aa5;
+      --radius:18px;
+      --shadow: 0 12px 30px rgba(0,0,0,.35);
+      color-scheme: dark;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
-    [data-theme="dark"]{
-      --bg:#2b2d31; --card:#343741; --text:#f2f2f2; --muted:#b6bcc6;
-      --border:#4a4f5a; --border2:#3e424b; --shadow:rgba(0,0,0,.35);
-      --btn:#404552; --btnText:#f2f2f2; --pill:#3a3f4a;
-      --focus:rgba(130,180,255,.35);
+    [data-theme="light"]{
+      --bg:#f6f7fb; --panel:#ffffff; --panel2:#ffffff; --text:#1b2230; --muted:#556070;
+      --line:rgba(10,20,40,.12); --chip:rgba(10,20,40,.06); --btn:#eef1f7;
+      color-scheme: light;
     }
-
-    body{
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-      margin: 12px;
-      background: var(--bg);
-      color: var(--text);
-      max-width: 980px;
-    }
-    h1{ font-size: 20px; margin: 0; }
-    h2{ font-size: 16px; margin: 0 0 8px; }
-    h3{ font-size: 14px; margin: 0 0 8px; }
-    .muted{ color: var(--muted); font-size: 13px; line-height: 1.35; }
-
+    body{ margin:0; background:var(--bg); color:var(--text); }
+    .wrap{ max-width:1100px; margin:0 auto; padding:22px 16px 40px; }
+    h1{ margin:0 0 14px; font-size:42px; letter-spacing:-.02em; }
     .topbar{
-      display:flex; gap:10px; flex-wrap:wrap;
-      align-items:center; justify-content:space-between;
-      margin-bottom: 8px;
+      display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+      margin: 10px 0 18px;
     }
-
-    .row{ display:flex; gap:12px; flex-wrap:wrap; }
-    .card{
-      border: 1px solid var(--border);
-      background: var(--card);
-      border-radius: 14px;
-      padding: 14px;
-      box-shadow: 0 2px 10px var(--shadow);
-      flex: 1;
-      min-width: 320px;
+    .right{ display:flex; gap:10px; align-items:center; }
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 14px; border-radius:999px; border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
     }
-
+    .dot{ width:12px; height:12px; border-radius:999px; background:#999; display:inline-block; }
     button{
-      padding: 12px 12px;
+      border:1px solid var(--line);
+      background:var(--btn);
+      color:var(--text);
+      padding:10px 14px; border-radius:14px;
       cursor:pointer;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--btn);
-      color: var(--btnText);
-      font-weight: 800;
-      touch-action: manipulation;
+      font-weight:700;
     }
-    button:disabled{ opacity:.55; cursor:not-allowed; }
-
+    button:disabled{ opacity:.5; cursor:not-allowed; }
     input, select, textarea{
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      color: var(--text);
-      outline: none;
-      font-size: 15px;
+      width:100%;
+      box-sizing:border-box;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 12px;
+      outline:none;
     }
-    textarea{ min-height: 80px; resize: vertical; }
-    input:focus, select:focus, textarea:focus{
-      box-shadow: 0 0 0 4px var(--focus);
-      border-color: transparent;
+    textarea{ min-height:86px; resize:vertical; }
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow: var(--shadow);
+      margin: 12px 0;
     }
-    .inline{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .btnRow{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px; }
-
-    .divider{ height: 1px; background: var(--border2); margin: 12px 0; }
-
-    .big{ font-size: 26px; font-weight: 900; margin: 8px 0; }
-
-    /* Vegas-ish Spin button */
-    .spinBtn{
-      position: relative;
-      padding: 14px 18px;
-      font-size: 16px;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      border-radius: 999px;
-      border: 2px solid transparent;
-      box-shadow: 0 10px 22px rgba(0,0,0,.22), inset 0 0 0 2px rgba(255,255,255,.18);
-      background:
-        radial-gradient(circle at 30% 20%, rgba(255,255,255,.45), rgba(255,255,255,0) 40%),
-        linear-gradient(135deg, #ff4fd8, #ffcc00, #35d7ff, #8cff6b);
-      color: #111;
-    }
-    .spinBtn:active{ transform: translateY(1px) scale(.99); }
-    .spinBtn::after{
-      content:"";
-      position:absolute; inset:-3px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(255,255,255,.35), rgba(255,255,255,0), rgba(255,255,255,.35));
-      filter: blur(10px);
-      opacity: .55;
-      z-index:-1;
-    }
-
+    .row{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+    .grow{ flex:1; min-width:220px; }
+    .muted{ color:var(--muted); font-size:13px; }
+    .smallMuted{ color:var(--muted); font-size:12px; }
+    .divider{ height:1px; background:var(--line); margin:12px 0; }
     .tag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      border: 1px solid var(--border);
-      background: var(--pill);
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-      font-weight: 800;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px;
+      background:var(--chip); border:1px solid var(--line);
+      font-size:13px; white-space:nowrap;
     }
-    .dot{
-      width: 10px; height: 10px; border-radius: 999px;
-      background: #999;
-      border: 1px solid rgba(0,0,0,.12);
-    }
-
-    details{
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px;
-      background: var(--card);
-      box-shadow: 0 2px 10px var(--shadow);
-      margin-top: 12px;
-    }
-    summary{
+    details > summary{
+      list-style:none;
       cursor:pointer;
-      font-weight: 900;
-      list-style: none;
+      user-select:none;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      font-weight:900;
+      font-size:18px;
     }
-    summary::-webkit-details-marker{ display:none; }
-
-    .grid2{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .grid3{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .itemCard{
-      border: 1px solid var(--border);
-      background: var(--bg);
-      border-radius: 14px;
-      padding: 12px;
-    }
-    .itemTop{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
-    }
-    .itemName{
-      font-weight: 900;
-      line-height: 1.2;
-    }
-    .smallMuted{ color: var(--muted); font-size: 12px; line-height: 1.35; margin-top: 4px; }
-
-    table{ width:100%; border-collapse: collapse; font-size: 14px; }
-    th,td{ border-bottom:1px solid var(--border2); padding:10px 6px; text-align:left; vertical-align: top; }
-
-    /* ---- Condensed Filters (Option B) ---- */
-    .filtersBar{
-      margin-top: 10px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      border-radius: 14px;
-      padding: 10px;
-    }
-    .filtersRow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap: wrap;
-    }
-    .filtersChips{
-      display:flex;
-      gap:8px;
-      flex-wrap: wrap;
-      align-items:center;
-      min-width: 180px;
-    }
+    details > summary::-webkit-details-marker{ display:none; }
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; }
     .fChip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      border: 1px solid var(--border);
-      background: var(--pill);
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-      font-weight: 900;
-      cursor: pointer;
-      user-select:none;
-      white-space: nowrap;
-    }
-    .fChip .x{
-      opacity: .75;
-      font-weight: 900;
-    }
-    .btnCompact{
-      padding: 8px 10px;
-      font-size: 13px;
-      border-radius: 999px;
-    }
-    .drawer{ margin-top: 10px; }
-    .drawer.is-collapsed{ display:none; }
-
-    .checkRow{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items:center;
-    }
-    label.cb{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      padding: 8px 10px;
-      border-radius: 999px;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px; border-radius:999px;
+      background:var(--chip); border:1px solid var(--line);
       cursor:pointer;
-      user-select:none;
-      font-weight: 900;
-      font-size: 12px;
     }
-    label.cb input{ width:auto; }
-
-    /* ---- Time controls ---- */
-    .timeBar{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      border-radius: 14px;
-      padding: 10px;
+    .fChip .x{ opacity:.75; font-weight:900; }
+    .grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .grid3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; }
+    @media (max-width: 780px){
+      h1{ font-size:32px; }
+      .grid2,.grid3{ grid-template-columns: 1fr; }
     }
-    .timeLabel{
-      font-weight: 900;
-      font-size: 13px;
+    .result{ font-size:34px; font-weight:950; letter-spacing:-.02em; }
+    .btnRow{ display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin-top:12px; }
+    table{ width:100%; border-collapse:collapse; }
+    th,td{ text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); font-size:14px; }
+    th{ color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
+    .itemCard{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      background:rgba(255,255,255,.02);
+      margin:10px 0;
     }
-    .timeMini{
-      display:flex;
-      gap:8px;
-      flex-wrap: wrap;
-      align-items:center;
-    }
-    .timeMini button{
-      padding: 8px 10px;
-      font-size: 13px;
-      border-radius: 999px;
-    }
-    .timeMini input{
-      width: 140px;
-      padding: 10px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-    }
-
-    @media (max-width: 760px){
-      .card{ min-width: 100%; }
-      .grid2{ grid-template-columns: 1fr; }
-      .grid3{ grid-template-columns: 1fr; }
-      .spinBtn{ width: 100%; }
-      .filtersRow{ justify-content:flex-start; }
-    }
+    .itemTop{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+    .inline{ display:flex; gap:8px; align-items:center; }
+    .danger{ border-color: rgba(255,90,165,.35); }
+    .dangerBtn{ background: rgba(255,90,165,.16); border-color: rgba(255,90,165,.35); }
+    .okBtn{ background: rgba(73,209,125,.14); border-color: rgba(73,209,125,.35); }
+    .spacer8{ height:8px; }
   </style>
 </head>
-
 <body>
-  <div class="topbar">
-    <h1 id="appTitle">Studio Spinner + Energy Tracker</h1>
-    <div class="inline">
-      <button id="themeBtn">Dark Mode</button>
-      <button id="syncBtn">Sync now</button>
+  <div class="wrap">
+    <h1>Studio Spinner + Energy Tracker</h1>
+
+    <div class="topbar">
+      <div class="pill">
+        <span class="dot" id="cloudDot"></span>
+        <span id="cloudText">Cloud: —</span>
+      </div>
+      <div class="right">
+        <button id="themeBtn">Light Mode</button>
+        <button id="syncBtn">Sync now</button>
+      </div>
     </div>
-  </div>
 
-  <p class="muted" id="statusLine">Loading…</p>
-
-  <!-- SPINNER FIRST (phone-first) -->
-  <div class="row">
     <div class="card">
-      <h2>Spin</h2>
-
-      <div class="inline" style="justify-content:space-between; width:100%;">
-        <div class="tag" id="inPlayTag"><span class="dot" style="background:#999"></span><span>In play: —</span></div>
-        <div class="tag" id="cloudTag"><span class="dot" id="cloudDot"></span><span id="cloudText">Cloud: —</span></div>
+      <div class="row">
+        <div class="grow">
+          <div class="muted">User label</div>
+          <input id="userLabel" placeholder="John" />
+        </div>
+        <div class="pill">
+          <span class="dot" id="inPlayDot"></span>
+          <span id="inPlayText">In play: —</span>
+        </div>
       </div>
 
-      <!-- Condensed Filters Bar -->
-      <div class="filtersBar">
-        <div class="filtersRow">
-          <div class="filtersChips" id="filtersChips"></div>
+      <div class="spacer8"></div>
 
-          <div class="inline" style="gap:8px;">
-            <button id="clearFiltersBtn" type="button" class="btnCompact">Clear</button>
-            <button id="allFiltersBtn" type="button" class="btnCompact">All</button>
+      <div class="chips" id="filtersChips"></div>
 
-            <button id="toggleFiltersBtn" type="button" class="btnCompact" aria-expanded="false">
-              Filters ▾
-            </button>
-          </div>
+      <div class="divider"></div>
+
+      <div class="row">
+        <button id="toggleFiltersBtn">Filters ▾</button>
+        <button id="clearFiltersBtn">Clear</button>
+        <button id="allFiltersBtn">All</button>
+        <div class="grow"></div>
+      </div>
+
+      <div id="filtersDrawer" class="spacer8" style="margin-top:10px;">
+        <div id="bucketFilters" class="chips"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <div class="muted">Spin</div>
+          <div class="result" id="result">—</div>
+          <div class="smallMuted" id="resultMeta">Spin to get a suggestion, or log manually.</div>
         </div>
-
-        <div id="filtersDrawer" class="drawer is-collapsed">
-          <div class="divider"></div>
-          <p class="muted" style="margin:0 0 8px;">Choose which buckets are “in play” for spinning.</p>
-          <div class="checkRow" id="bucketFilters"></div>
+        <div class="inline">
+          <button id="spinBtn" class="okBtn">SPIN</button>
         </div>
       </div>
 
       <div class="divider"></div>
 
-      <div class="big" id="result">—</div>
-      <div class="muted" id="resultMeta">Spin to get a suggestion, or log manually.</div>
-
-      <div class="btnRow">
-        <button class="spinBtn" id="spinBtn">SPIN</button>
+      <div class="row">
         <button id="workedBtn" disabled>Worked</button>
         <button id="skippedBtn" disabled>Skipped</button>
+        <div class="grow"></div>
+        <span class="tag" id="spinTimeLabel"><span class="dot"></span><span>Time: 0m</span></span>
       </div>
 
-      <!-- Time controls (Spin) -->
-      <div class="timeBar">
-        <div class="timeLabel" id="spinTimeLabel">Time: 0m</div>
-        <div class="timeMini">
-          <button id="spinAdd15" type="button">+15m</button>
-          <button id="spinAdd30" type="button">+30m</button>
-          <button id="spinAdd60" type="button">+1h</button>
-          <input id="spinTimeCustom" inputmode="numeric" placeholder="Custom minutes (e.g. 180)" />
-          <button id="spinTimeClear" type="button">Clear</button>
-        </div>
+      <div class="row" style="margin-top:10px;">
+        <button id="spinAdd15">+15m</button>
+        <button id="spinAdd30">+30m</button>
+        <button id="spinAdd60">+1h</button>
+        <input id="spinTimeCustom" placeholder="Custom minutes (e.g. 45)" inputmode="numeric" style="max-width:240px;" />
+        <button id="spinTimeClear">Clear</button>
       </div>
 
-      <div style="margin-top: 12px;">
-        <label class="muted">Optional note (spin):</label>
-        <input id="spinNote" placeholder="e.g., “45m underpainting / 2 thumbnails / wrote outline”" />
-      </div>
-
-      <div class="divider"></div>
-
-      <h3>Manual log (no spin)</h3>
-      <div class="inline">
-        <select id="manualSelect" style="font-size:18px; padding:14px;"></select>
-        <button id="manualWorkedBtn">Worked</button>
-      </div>
-
-      <!-- Time controls (Manual) -->
-      <div class="timeBar">
-        <div class="timeLabel" id="manualTimeLabel">Time: 0m</div>
-        <div class="timeMini">
-          <button id="manualAdd15" type="button">+15m</button>
-          <button id="manualAdd30" type="button">+30m</button>
-          <button id="manualAdd60" type="button">+1h</button>
-          <input id="manualTimeCustom" inputmode="numeric" placeholder="Custom minutes (e.g. 180)" />
-          <button id="manualTimeClear" type="button">Clear</button>
-        </div>
-      </div>
-
-      <div style="margin-top: 12px;">
-        <label class="muted">Optional note (manual):</label>
-        <input id="manualNote" placeholder="" />
-      </div>
-
-      <div class="divider"></div>
-
-      <div style="margin-top: 10px;">
-        <label class="muted">User label (stored locally):</label>
-        <input id="userLabel" placeholder="John" />
-      </div>
+      <div class="spacer8"></div>
+      <div class="muted">Optional note (spin)</div>
+      <input id="spinNote" placeholder='e.g., "45m underpainting / 2 thumbnails / wrote outline"' />
     </div>
-  </div>
 
-  <!-- Stats + history (moved ABOVE manage; closed by default) -->
-  <details>
-    <summary>Stats + history</summary>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div>
+          <div class="muted">Manual log (no spin)</div>
+        </div>
+      </div>
 
-    <div class="divider"></div>
+      <div class="spacer8"></div>
 
-    <div class="row">
-      <div class="card">
-        <h2>Energy stats</h2>
+      <div class="grid2">
+        <div>
+          <div class="muted">Series</div>
+          <select id="manualSelect"></select>
+        </div>
+        <div>
+          <div class="muted">Outcome</div>
+          <div class="row">
+            <button id="manualWorkedBtn" class="okBtn">Worked</button>
+            <button id="manualSkippedBtn">Skipped</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <span class="tag" id="manualTimeLabel"><span class="dot"></span><span>Time: 0m</span></span>
+        <div class="grow"></div>
+      </div>
+
+      <div class="row" style="margin-top:10px;">
+        <button id="manualAdd15">+15m</button>
+        <button id="manualAdd30">+30m</button>
+        <button id="manualAdd60">+1h</button>
+        <input id="manualTimeCustom" placeholder="Custom minutes (e.g. 30)" inputmode="numeric" style="max-width:240px;" />
+        <button id="manualTimeClear">Clear</button>
+      </div>
+
+      <div class="spacer8"></div>
+      <div class="muted">Optional note (manual)</div>
+      <input id="manualNote" placeholder="What did you do?" />
+    </div>
+
+    <details class="card" open>
+      <summary>
+        <span>Stats + history</span>
+        <span class="muted" id="statusLine">Loading…</span>
+      </summary>
+      <div class="divider"></div>
+
+      <div class="muted">Stats (active series)</div>
+      <div style="overflow:auto;">
         <table>
           <thead>
             <tr>
-              <th>Series</th>
-              <th>Chosen</th>
-              <th>Worked</th>
-              <th>Skipped</th>
-              <th>Follow-through</th>
+              <th>Series</th><th>Chosen</th><th>Worked</th><th>Skipped</th><th>Worked %</th>
             </tr>
           </thead>
           <tbody id="statsBody"></tbody>
         </table>
       </div>
 
-      <div class="card">
-        <h2>Recent history</h2>
+      <div class="divider"></div>
+
+      <div class="muted">Recent history (last 30)</div>
+      <div style="overflow:auto;">
         <table>
           <thead>
             <tr>
-              <th>When</th>
-              <th>Series</th>
-              <th>Outcome</th>
-              <th>Minutes</th>
-              <th>Note</th>
+              <th>When</th><th>Series</th><th>Outcome</th><th>Minutes</th><th>Note</th>
             </tr>
           </thead>
           <tbody id="historyBody"></tbody>
         </table>
       </div>
-    </div>
-  </details>
+    </details>
 
-  <!-- Manage buckets + series (moved BELOW stats; closed by default) -->
-  <details>
-    <summary>Manage buckets + series</summary>
-    <p class="muted" style="margin-top:8px;">
-      These edits write back to Google Sheets (authenticated by your token).
-      Descriptions are collapsible on each series card.
-    </p>
+    <details class="card">
+      <summary>
+        <span>Manage buckets + series</span>
+        <span class="muted">Edits go to Google Sheet</span>
+      </summary>
+      <div class="divider"></div>
 
-    <div class="divider"></div>
-
-    <div class="row">
-      <div class="card">
-        <h2>Buckets</h2>
-        <div class="btnRow">
-          <button id="addBucketBtn">+ Add bucket</button>
-        </div>
-        <div id="bucketList" class="grid2" style="margin-top:10px;"></div>
+      <div class="row">
+        <button id="addBucketBtn">+ Add bucket</button>
+        <button id="addSeriesBtn">+ Add series</button>
+        <div class="grow"></div>
       </div>
 
-      <div class="card">
-        <h2>Series</h2>
-        <div class="btnRow">
-          <button id="addSeriesBtn">+ Add series</button>
-        </div>
-        <div id="seriesList" style="margin-top:10px;"></div>
-      </div>
-    </div>
-  </details>
+      <div class="divider"></div>
+
+      <div class="muted">Buckets</div>
+      <div id="bucketList"></div>
+
+      <div class="divider"></div>
+
+      <div class="muted">Series</div>
+      <div id="seriesList"></div>
+    </details>
+
+  </div>
 
 <script>
-  // ====== CONFIG (hardcoded for now) ======
-  const API_URL = "https://script.google.com/macros/s/AKfycbzUyR9mpcMPGWzZT4P2XoHsba_oARB5UXm0OkjbaGmqKg3rO3-6njpRhE5YlRVwtp3n/exec";
-  const API_TOKEN = "dbq2rku-QZY7cqy0bkm";
-  const APP_VERSION = "v3-sheet-sync-condensed-filters-time";
+/* ============================================================
+   Studio Spinner + Energy Tracker (single-file, Safari-friendly)
+   - Reads via JSONP (script tag)
+   - Writes via Image beacon (no JS execution of response)
+   - Offline cache via localStorage
+   ============================================================ */
 
-  // ====== Local cache keys ======
-  const LS_THEME = "spinner_theme_v2";
-  const LS_USER  = "spinner_user_v2";
-  const LS_BUCKETS = "spinner_cache_buckets_v2";
-  const LS_SERIES  = "spinner_cache_series_v2";
-  const LS_EVENTS  = "spinner_cache_events_v2";
-  const LS_FILTERS = "spinner_bucket_filters_v2";
+// ====== CONFIG (hardcoded for now) ======
+const API_URL = "https://script.google.com/macros/s/AKfycbzUyR9mpcMPGWzZT4P2XoHsba_oARB5UXm0OkjbaGmqKg3rO3-6njpRhE5YlRVwtp3n/exec";
+const API_TOKEN = "dbq2rku-QZY7cqy0bkm";
+const APP_VERSION = "v4-safari-safe-write";
 
-  // ====== Helpers ======
-  const el = (id) => document.getElementById(id);
-  const statusLine = el("statusLine");
-  const cloudDot = el("cloudDot");
-  const cloudText = el("cloudText");
+// ====== Local cache keys ======
+const LS_THEME   = "spinner_theme_v2";
+const LS_USER    = "spinner_user_v2";
+const LS_BUCKETS = "spinner_cache_buckets_v2";
+const LS_SERIES  = "spinner_cache_series_v2";
+const LS_EVENTS  = "spinner_cache_events_v2";
+const LS_FILTERS = "spinner_bucket_filters_v2";
 
-  function setCloud(ok, msg){
-    cloudDot.style.background = ok ? "#49d17d" : "#ff5aa5";
-    cloudText.textContent = msg;
+// ====== Helpers ======
+const el = (id) => document.getElementById(id);
+const statusLine = el("statusLine");
+const cloudDot = el("cloudDot");
+const cloudText = el("cloudText");
+
+function setCloud(ok, msg){
+  cloudDot.style.background = ok ? "#49d17d" : "#ff5aa5";
+  cloudText.textContent = msg;
+}
+
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, (m) => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[m]));
+}
+
+function nowISO(){
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function uuid(){
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+    const r = Math.random()*16|0;
+    const v = c === "x" ? r : (r&0x3|0x8);
+    return v.toString(16);
+  });
+}
+
+function toBool(v){
+  if (v === true || v === false) return v;
+  const s = String(v).trim().toLowerCase();
+  if (["true","t","1","yes","y"].includes(s)) return true;
+  if (["false","f","0","no","n"].includes(s)) return false;
+  return false;
+}
+
+function normalizeHex(h){
+  if (!h) return "";
+  const s = String(h).trim();
+  if (!s) return "";
+  return s.startsWith("#") ? s : ("#" + s);
+}
+
+function asArray(maybe){
+  if (Array.isArray(maybe)) return maybe;
+  if (!maybe || typeof maybe !== "object") return [];
+  for (const k of ["data","rows","events","items","result"]){
+    if (Array.isArray(maybe[k])) return maybe[k];
   }
+  return [];
+}
 
-  function escapeHtml(str) {
-    return String(str ?? "").replace(/[&<>"']/g, (m) => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-    }[m]));
-  }
+function hasError(x){
+  return !!(x && typeof x === "object" && (x.error || x.err));
+}
 
-  function nowISO(){
-    const d = new Date();
-    const pad = (n) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  }
+// ====== JSONP (avoids CORS for reads) ======
+function jsonp(action, params = {}) {
+  return new Promise((resolve, reject) => {
+    const cb = "cb_" + Date.now() + "_" + Math.floor(Math.random()*1e6);
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error("Timeout"));
+    }, 12000);
 
-  function uuid(){
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
-      const r = Math.random()*16|0;
-      const v = c === "x" ? r : (r&0x3|0x8);
-      return v.toString(16);
-    });
-  }
+    let script = null;
 
-  function toBool(v){
-    if (v === true || v === false) return v;
-    const s = String(v).trim().toLowerCase();
-    if (["true","t","1","yes","y"].includes(s)) return true;
-    if (["false","f","0","no","n"].includes(s)) return false;
-    return false;
-  }
-
-  function normalizeHex(h){
-    if (!h) return "";
-    const s = String(h).trim();
-    if (!s) return "";
-    return s.startsWith("#") ? s : ("#" + s);
-  }
-
-  function asArray(maybe){
-    if (Array.isArray(maybe)) return maybe;
-    if (!maybe || typeof maybe !== "object") return [];
-    for (const k of ["data","rows","events","items","result"]){
-      if (Array.isArray(maybe[k])) return maybe[k];
-    }
-    return [];
-  }
-
-  function hasError(x){
-    return !!(x && typeof x === "object" && (x.error || x.err));
-  }
-
-  // ====== JSONP (avoids CORS) ======
-  function jsonp(action, params = {}) {
-    return new Promise((resolve, reject) => {
-      const cb = "cb_" + Date.now() + "_" + Math.floor(Math.random()*1e6);
-      const timeout = setTimeout(() => {
-        cleanup();
-        reject(new Error("Timeout"));
-      }, 12000);
-
-      let script = null;
-
-      function cleanup(){
-        clearTimeout(timeout);
-        try { delete window[cb]; } catch {}
-        if (script && script.parentNode) script.parentNode.removeChild(script);
-      }
-
-      window[cb] = (data) => {
-        cleanup();
-        resolve(data);
-      };
-
-      const qs = new URLSearchParams({
-        action,
-        token: API_TOKEN,
-        callback: cb,
-        ...Object.fromEntries(Object.entries(params).map(([k,v]) => [k, String(v ?? "")]))
-      });
-
-      script = document.createElement("script");
-      console.log("JSONP URL:", API_URL + "?" + qs.toString());
-      script.src = API_URL + "?" + qs.toString();
-      script.onerror = () => { cleanup(); reject(new Error("Network error")); };
-      document.body.appendChild(script);
-    });
-  }
-
-  // ====== Theme ======
-  function applyTheme(theme){
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem(LS_THEME, theme);
-    el("themeBtn").textContent = (theme === "dark") ? "Light Mode" : "Dark Mode";
-  }
-
-  // ====== Cache ======
-  function loadCache(key, fallback){
-    try {
-      const raw = localStorage.getItem(key);
-      if (!raw) return fallback;
-      return JSON.parse(raw);
-    } catch { return fallback; }
-  }
-  function saveCache(key, data){
-    localStorage.setItem(key, JSON.stringify(data));
-  }
-
-  // ====== State ======
-  let buckets = [];
-  let series = [];
-  let events = [];
-  let currentPick = null;
-
-  let spinMinutes = 0;
-  let manualMinutes = 0;
-
-  function getBucketById(id){ return buckets.find(b => String(b.bucket_id).trim() === String(id).trim()); }
-  function getSeriesById(id){ return series.find(s => String(s.series_id).trim() === String(id).trim()); }
-
-  function bucketLabel(b){ return b.bucket_name || b.bucket_id; }
-  function seriesLabel(s){ return s.series_name || s.series_id; }
-
-  function activeBuckets(){
-    return buckets
-      .filter(b => toBool(b.active) === true)
-      .sort((a,b)=> (Number(a.order||999) - Number(b.order||999)));
-  }
-
-  function activeSeries(){
-    return series.filter(s => toBool(s.active) === true);
-  }
-
-  // ====== Filters ======
-  function defaultFilters(){
-    const obj = {};
-    for (const b of activeBuckets()) obj[b.bucket_id] = true;
-    return obj;
-  }
-
-  function loadFilters(){
-    const f = loadCache(LS_FILTERS, null);
-    if (f && typeof f === "object") return f;
-    return defaultFilters();
-  }
-
-  function saveFilters(f){ saveCache(LS_FILTERS, f); }
-
-  function inPlaySeries(){
-    const f = loadFilters();
-    const set = new Map();
-    for (const s of activeSeries()){
-      if (!f[s.bucket_id]) continue;
-      set.set(s.series_id, s);
-    }
-    return Array.from(set.values()).sort((a,b)=>seriesLabel(a).localeCompare(seriesLabel(b)));
-  }
-
-  function refreshInPlayTag(){
-    const list = inPlaySeries();
-    el("inPlayTag").querySelector("span:last-child").textContent = `In play: ${list.length}`;
-  }
-
-  function renderFilterChips(){
-    const f = loadFilters();
-    const wrap = el("filtersChips");
-    wrap.innerHTML = "";
-
-    const act = activeBuckets();
-    const selected = act.filter(b => !!f[b.bucket_id]);
-
-    if (!selected.length){
-      const empty = document.createElement("span");
-      empty.className = "muted";
-      empty.textContent = "No buckets selected.";
-      wrap.appendChild(empty);
-      return;
+    function cleanup(){
+      clearTimeout(timeout);
+      try { delete window[cb]; } catch {}
+      if (script && script.parentNode) script.parentNode.removeChild(script);
     }
 
-    for (const b of selected){
-      const col = normalizeHex(b.color) || "#999";
-      const chip = document.createElement("span");
-      chip.className = "fChip";
-      chip.title = "Click to remove from in-play";
-      chip.innerHTML = `<span class="dot" style="background:${col}"></span><span>${escapeHtml(bucketLabel(b))}</span><span class="x">×</span>`;
-      chip.addEventListener("click", () => {
-        const next = loadFilters();
-        next[b.bucket_id] = false;
-        saveFilters(next);
-        renderFiltersDrawer();
-        renderFilterChips();
-        refreshInPlayTag();
-        renderManualSelect();
-      });
-      wrap.appendChild(chip);
-    }
-  }
+    window[cb] = (data) => { cleanup(); resolve(data); };
 
-  function renderFiltersDrawer(){
-    const f = loadFilters();
-    const wrap = el("bucketFilters");
-    wrap.innerHTML = "";
-
-    for (const b of activeBuckets()){
-      const id = b.bucket_id;
-      const col = normalizeHex(b.color) || "#999";
-
-      const lab = document.createElement("label");
-      lab.className = "cb";
-      lab.innerHTML = `
-        <input type="checkbox" ${f[id] ? "checked" : ""} />
-        <span class="dot" style="background:${col}"></span>
-        <span>${escapeHtml(bucketLabel(b))}</span>
-      `;
-      const cb = lab.querySelector("input");
-      cb.addEventListener("change", () => {
-        const next = loadFilters();
-        next[id] = cb.checked;
-        saveFilters(next);
-        renderFilterChips();
-        refreshInPlayTag();
-        renderManualSelect();
-      });
-
-      wrap.appendChild(lab);
-    }
-
-    renderFilterChips();
-    refreshInPlayTag();
-  }
-
-  function setAllFilters(value){
-    const next = loadFilters();
-    for (const b of activeBuckets()) next[b.bucket_id] = value;
-    saveFilters(next);
-    renderFiltersDrawer();
-    renderManualSelect();
-  }
-
-  function toggleFiltersDrawer(){
-    const drawer = el("filtersDrawer");
-    const btn = el("toggleFiltersBtn");
-    const isCollapsed = drawer.classList.contains("is-collapsed");
-    drawer.classList.toggle("is-collapsed", !isCollapsed ? true : false);
-    const nowOpen = isCollapsed;
-    btn.setAttribute("aria-expanded", nowOpen ? "true" : "false");
-    btn.textContent = nowOpen ? "Filters ▴" : "Filters ▾";
-  }
-
-  // ====== Time controls ======
-  function clampMinutes(n){
-    const x = Number(n);
-    if (!Number.isFinite(x)) return 0;
-    return Math.max(0, Math.min(24*60, Math.round(x)));
-  }
-
-  function updateTimeLabels(){
-    el("spinTimeLabel").textContent = `Time: ${spinMinutes}m`;
-    el("manualTimeLabel").textContent = `Time: ${manualMinutes}m`;
-  }
-
-  function wireTimeControls(prefix){
-    const add15 = el(prefix + "Add15");
-    const add30 = el(prefix + "Add30");
-    const add60 = el(prefix + "Add60");
-    const custom = el(prefix + "TimeCustom");
-    const clear = el(prefix + "TimeClear");
-
-    function getVal(){
-      return prefix === "spin" ? spinMinutes : manualMinutes;
-    }
-    function setVal(v){
-      if (prefix === "spin") spinMinutes = clampMinutes(v);
-      else manualMinutes = clampMinutes(v);
-      updateTimeLabels();
-    }
-
-    add15.addEventListener("click", () => setVal(getVal() + 15));
-    add30.addEventListener("click", () => setVal(getVal() + 30));
-    add60.addEventListener("click", () => setVal(getVal() + 60));
-
-    custom.addEventListener("change", () => {
-      const v = clampMinutes(custom.value);
-      setVal(v);
-      custom.value = "";
+    const qs = new URLSearchParams({
+      action,
+      token: API_TOKEN,
+      callback: cb,
+      _ts: String(Date.now()), // cache buster
+      ...Object.fromEntries(Object.entries(params).map(([k,v]) => [k, String(v ?? "")]))
     });
 
-    clear.addEventListener("click", () => setVal(0));
+    script = document.createElement("script");
+    script.src = API_URL + "?" + qs.toString();
+    script.onerror = () => { cleanup(); reject(new Error("Network error")); };
+    document.body.appendChild(script);
+  });
+}
+
+// ====== Safari-safe write: Image beacon (no JS execution) ======
+function beaconWrite(action, payload){
+  return new Promise((resolve, reject) => {
+    const qs = new URLSearchParams({
+      action,
+      token: API_TOKEN,
+      _ts: String(Date.now()),
+      ...Object.fromEntries(Object.entries(payload || {}).map(([k,v]) => [k, String(v ?? "")]))
+    });
+
+    const img = new Image();
+    img.onload = () => resolve({ ok: true });
+    img.onerror = () => reject(new Error("Beacon failed"));
+    img.src = API_URL + "?" + qs.toString();
+  });
+}
+
+// ====== Theme ======
+function applyTheme(theme){
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem(LS_THEME, theme);
+  el("themeBtn").textContent = (theme === "dark") ? "Light Mode" : "Dark Mode";
+}
+
+// ====== Cache ======
+function loadCache(key, fallback){
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw);
+  } catch { return fallback; }
+}
+function saveCache(key, data){ localStorage.setItem(key, JSON.stringify(data)); }
+
+// ====== State ======
+let buckets = [];
+let series = [];
+let events = [];
+let currentPick = null;
+
+let spinMinutes = 0;
+let manualMinutes = 0;
+
+function getBucketById(id){ return buckets.find(b => String(b.bucket_id).trim() === String(id).trim()); }
+function getSeriesById(id){ return series.find(s => String(s.series_id).trim() === String(id).trim()); }
+
+function bucketLabel(b){ return b.bucket_name || b.bucket_id || ""; }
+function seriesLabel(s){ return s.series_name || s.series_id || ""; }
+
+function activeBuckets(){
+  return buckets
+    .filter(b => toBool(b.active) === true)
+    .sort((a,b)=> (Number(a.order||999) - Number(b.order||999)));
+}
+function activeSeries(){
+  return series.filter(s => toBool(s.active) === true);
+}
+
+// ====== Filters ======
+function defaultFilters(){
+  const obj = {};
+  for (const b of activeBuckets()) obj[b.bucket_id] = true;
+  return obj;
+}
+function loadFilters(){
+  const f = loadCache(LS_FILTERS, null);
+  if (f && typeof f === "object") return f;
+  return defaultFilters();
+}
+function saveFilters(f){ saveCache(LS_FILTERS, f); }
+
+function inPlaySeries(){
+  const f = loadFilters();
+  const set = new Map();
+  for (const s of activeSeries()){
+    if (!f[s.bucket_id]) continue;
+    set.set(s.series_id, s);
+  }
+  return Array.from(set.values()).sort((a,b)=>seriesLabel(a).localeCompare(seriesLabel(b)));
+}
+
+function refreshInPlayTag(){
+  const list = inPlaySeries();
+  el("inPlayDot").style.background = list.length ? "#49d17d" : "#999";
+  el("inPlayText").textContent = `In play: ${list.length}`;
+}
+
+function renderFilterChips(){
+  const f = loadFilters();
+  const wrap = el("filtersChips");
+  wrap.innerHTML = "";
+
+  const act = activeBuckets();
+  const selected = act.filter(b => !!f[b.bucket_id]);
+
+  if (!selected.length){
+    const empty = document.createElement("span");
+    empty.className = "muted";
+    empty.textContent = "No buckets selected.";
+    wrap.appendChild(empty);
+    return;
   }
 
-  // ====== Spinner + logging ======
-  function spin(){
-    const list = inPlaySeries();
-    if (!list.length){
-      el("result").textContent = "—";
-      el("resultMeta").textContent = "No series in play. Enable at least one bucket filter that contains active series.";
-      return;
-    }
-    const idx = Math.floor(Math.random()*list.length);
-    currentPick = list[idx];
-    el("result").textContent = seriesLabel(currentPick);
-    el("resultMeta").textContent = `Picked at ${nowISO()}`;
-    el("workedBtn").disabled = false;
-    el("skippedBtn").disabled = false;
+  for (const b of selected){
+    const col = normalizeHex(b.color) || "#999";
+    const chip = document.createElement("span");
+    chip.className = "fChip";
+    chip.title = "Click to remove from in-play";
+    chip.innerHTML = `<span class="dot" style="background:${col}"></span><span>${escapeHtml(bucketLabel(b))}</span><span class="x">×</span>`;
+    chip.addEventListener("click", () => {
+      const next = loadFilters();
+      next[b.bucket_id] = false;
+      saveFilters(next);
+      renderFiltersDrawer();
+      renderFilterChips();
+      refreshInPlayTag();
+      renderManualSelect();
+    });
+    wrap.appendChild(chip);
+  }
+}
+
+function renderFiltersDrawer(){
+  const f = loadFilters();
+  const wrap = el("bucketFilters");
+  wrap.innerHTML = "";
+
+  for (const b of activeBuckets()){
+    const id = b.bucket_id;
+    const col = normalizeHex(b.color) || "#999";
+
+    const lab = document.createElement("label");
+    lab.className = "tag";
+    lab.style.cursor = "pointer";
+    lab.innerHTML = `
+      <input type="checkbox" ${f[id] ? "checked" : ""} style="width:auto; margin:0;" />
+      <span class="dot" style="background:${col}"></span>
+      <span>${escapeHtml(bucketLabel(b))}</span>
+    `;
+    const cb = lab.querySelector("input");
+    cb.addEventListener("change", () => {
+      const next = loadFilters();
+      next[id] = cb.checked;
+      saveFilters(next);
+      renderFilterChips();
+      refreshInPlayTag();
+      renderManualSelect();
+    });
+
+    wrap.appendChild(lab);
   }
 
-  async function logOutcome(outcome, source, chosenSeries, note, minutes){
-    const s = chosenSeries;
-    if (!s) return;
+  renderFilterChips();
+  refreshInPlayTag();
+}
 
-    const b = getBucketById(s.bucket_id) || {};
-    const user = (el("userLabel").value || "John").trim();
+function setAllFilters(value){
+  const next = loadFilters();
+  for (const b of activeBuckets()) next[b.bucket_id] = value;
+  saveFilters(next);
+  renderFiltersDrawer();
+  renderManualSelect();
+}
 
-    const payload = {
-      id: uuid(),
-      timestamp: nowISO(),
-      user,
-      series_id: s.series_id,
-      series_name: seriesLabel(s),
-      bucket_id: s.bucket_id,
-      bucket_name: bucketLabel(b),
-      outcome,
-      minutes: clampMinutes(minutes || 0),
-      note: (note || "").trim(),
-      source,
-      app_version: APP_VERSION
-    };
+let filtersOpen = true;
+function toggleFiltersDrawer(){
+  filtersOpen = !filtersOpen;
+  el("bucketFilters").style.display = filtersOpen ? "" : "none";
+  el("toggleFiltersBtn").textContent = filtersOpen ? "Filters ▴" : "Filters ▾";
+}
 
-    // Optimistic local append
-    events.push(payload);
-    saveCache(LS_EVENTS, events);
-    renderStatsAndHistory();
+// ====== Time controls ======
+function clampMinutes(n){
+  const x = Number(n);
+  if (!Number.isFinite(x)) return 0;
+  return Math.max(0, Math.min(24*60, Math.round(x)));
+}
+function updateTimeLabels(){
+  el("spinTimeLabel").querySelector("span:last-child").textContent = `Time: ${spinMinutes}m`;
+  el("manualTimeLabel").querySelector("span:last-child").textContent = `Time: ${manualMinutes}m`;
+}
+function wireTimeControls(prefix){
+  const add15 = el(prefix + "Add15");
+  const add30 = el(prefix + "Add30");
+  const add60 = el(prefix + "Add60");
+  const custom = el(prefix + "TimeCustom");
+  const clear = el(prefix + "TimeClear");
 
-    // Cloud append
-    try {
-      const res = await jsonp("logEvent", payload);
-      if (res && (res.ok === true || res.success === true)) setCloud(true, "Cloud: ok");
-      else if (hasError(res)) setCloud(false, "Cloud: error");
-      else setCloud(true, "Cloud: ok");
-    } catch {
-      setCloud(false, "Cloud: offline?");
-    }
-  }
-
-  function logSpin(outcome){
-    if (!currentPick) return;
-    const note = el("spinNote").value;
-    logOutcome(outcome, "spin", currentPick, note, spinMinutes);
-    el("spinNote").value = "";
-    el("workedBtn").disabled = true;
-    el("skippedBtn").disabled = true;
-    currentPick = null;
-    spinMinutes = 0;
+  function getVal(){ return prefix === "spin" ? spinMinutes : manualMinutes; }
+  function setVal(v){
+    if (prefix === "spin") spinMinutes = clampMinutes(v);
+    else manualMinutes = clampMinutes(v);
     updateTimeLabels();
   }
 
-  function logManual(){
-    const id = el("manualSelect").value;
-    const s = getSeriesById(id);
-    const note = el("manualNote").value;
-    logOutcome("worked", "manual", s, note, manualMinutes);
-    el("manualNote").value = "";
-    manualMinutes = 0;
-    updateTimeLabels();
+  add15.addEventListener("click", () => setVal(getVal() + 15));
+  add30.addEventListener("click", () => setVal(getVal() + 30));
+  add60.addEventListener("click", () => setVal(getVal() + 60));
+
+  custom.addEventListener("change", () => {
+    const v = clampMinutes(custom.value);
+    setVal(v);
+    custom.value = "";
+  });
+
+  clear.addEventListener("click", () => setVal(0));
+}
+
+// ====== Spinner + logging ======
+function spin(){
+  const list = inPlaySeries();
+  if (!list.length){
+    el("result").textContent = "—";
+    el("resultMeta").textContent = "No series in play. Enable at least one bucket that contains active series.";
+    return;
+  }
+  const idx = Math.floor(Math.random()*list.length);
+  currentPick = list[idx];
+  el("result").textContent = seriesLabel(currentPick);
+  el("resultMeta").textContent = `Picked at ${nowISO()}`;
+  el("workedBtn").disabled = false;
+  el("skippedBtn").disabled = false;
+}
+
+async function logOutcome(outcome, source, chosenSeries, note, minutes){
+  const s = chosenSeries;
+  if (!s) return;
+
+  const b = getBucketById(s.bucket_id) || {};
+  const user = (el("userLabel").value || "John").trim();
+
+  const payload = {
+    id: uuid(),
+    timestamp: nowISO(),
+    user,
+    series_id: s.series_id,
+    series_name: seriesLabel(s),
+    bucket_id: s.bucket_id,
+    bucket_name: bucketLabel(b),
+    outcome,
+    minutes: clampMinutes(minutes || 0),
+    note: (note || "").trim(),
+    source,
+    app_version: APP_VERSION
+  };
+
+  // Optimistic local append
+  events.push(payload);
+  saveCache(LS_EVENTS, events);
+  renderStatsAndHistory();
+
+  // Cloud append (Safari-safe write)
+  try {
+    await beaconWrite("logEvent", payload);
+    setCloud(true, "Cloud: sent");
+  } catch {
+    setCloud(false, "Cloud: send failed");
+  }
+}
+
+function logSpin(outcome){
+  if (!currentPick) return;
+  const note = el("spinNote").value;
+  logOutcome(outcome, "spin", currentPick, note, spinMinutes);
+  el("spinNote").value = "";
+  el("workedBtn").disabled = true;
+  el("skippedBtn").disabled = true;
+  currentPick = null;
+  spinMinutes = 0;
+  updateTimeLabels();
+}
+
+function logManual(outcome){
+  const id = el("manualSelect").value;
+  const s = getSeriesById(id);
+  const note = el("manualNote").value;
+  logOutcome(outcome, "manual", s, note, manualMinutes);
+  el("manualNote").value = "";
+  manualMinutes = 0;
+  updateTimeLabels();
+}
+
+// ====== Rendering: manual select ======
+function renderManualSelect(){
+  const sel = el("manualSelect");
+  const list = inPlaySeries().length ? inPlaySeries() : activeSeries().slice().sort((a,b)=>seriesLabel(a).localeCompare(seriesLabel(b)));
+  sel.innerHTML = "";
+  for (const s of list){
+    const opt = document.createElement("option");
+    opt.value = s.series_id;
+    opt.textContent = seriesLabel(s);
+    sel.appendChild(opt);
+  }
+}
+
+// ====== Stats + History ======
+function renderStatsAndHistory(){
+  const seriesMap = new Map(activeSeries().map(s => [String(s.series_id).trim(), s]));
+  const stats = {};
+  for (const [id, s] of seriesMap){
+    stats[id] = { chosen: 0, worked: 0, skipped: 0, name: seriesLabel(s) };
   }
 
-  // ====== Rendering: manual select ======
-  function renderManualSelect(){
-    const sel = el("manualSelect");
-    const list = inPlaySeries().length ? inPlaySeries() : activeSeries().slice().sort((a,b)=>seriesLabel(a).localeCompare(seriesLabel(b)));
-    sel.innerHTML = "";
-    for (const s of list){
+  for (const e of (events || [])){
+    const sid = String(e.series_id || "").trim();
+    if (!stats[sid]) continue;
+    stats[sid].chosen += 1;
+    if (String(e.outcome).toLowerCase() === "worked") stats[sid].worked += 1;
+    if (String(e.outcome).toLowerCase() === "skipped") stats[sid].skipped += 1;
+  }
+
+  const rows = Object.values(stats).sort((a,b)=>a.name.localeCompare(b.name));
+  const tb = el("statsBody");
+  tb.innerHTML = "";
+  function pct(a,b){ return b ? Math.round((a/b)*100) + "%" : "—"; }
+
+  for (const r of rows){
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${escapeHtml(r.name)}</td>
+      <td>${r.chosen}</td>
+      <td>${r.worked}</td>
+      <td>${r.skipped}</td>
+      <td>${pct(r.worked, r.chosen)}</td>
+    `;
+    tb.appendChild(tr);
+  }
+
+  const hb = el("historyBody");
+  hb.innerHTML = "";
+  const recent = (events || []).slice(-30).reverse();
+  for (const e of recent){
+    const tr = document.createElement("tr");
+    const outcomeTxt = String(e.outcome).toLowerCase() === "worked" ? "✅ worked" : "⏭️ skipped";
+    tr.innerHTML = `
+      <td>${escapeHtml(e.timestamp || e.at || "")}</td>
+      <td>${escapeHtml(e.series_name || e.series_id || "")}</td>
+      <td>${outcomeTxt}</td>
+      <td>${escapeHtml((e.minutes ?? "") === "" ? "" : String(e.minutes))}</td>
+      <td>${escapeHtml(e.note || "")}</td>
+    `;
+    hb.appendChild(tr);
+  }
+}
+
+// ====== Bucket manager UI ======
+function renderBucketManager(){
+  const wrap = el("bucketList");
+  wrap.innerHTML = "";
+
+  for (const b of buckets.slice().sort((a,b)=>Number(a.order||999)-Number(b.order||999))){
+    const col = normalizeHex(b.color) || "#999";
+    const card = document.createElement("div");
+    card.className = "itemCard";
+
+    card.innerHTML = `
+      <div class="itemTop">
+        <div>
+          <div class="tag"><span class="dot" style="background:${col}"></span><span>${escapeHtml(bucketLabel(b))}</span></div>
+          <div class="smallMuted">id: ${escapeHtml(b.bucket_id)}</div>
+        </div>
+        <div class="inline">
+          <button data-act="delete" class="dangerBtn">Delete</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid3">
+        <div>
+          <div class="muted">Name</div>
+          <input data-k="bucket_name" value="${escapeHtml(b.bucket_name || "")}">
+        </div>
+        <div>
+          <div class="muted">Color</div>
+          <input data-k="color" value="${escapeHtml(normalizeHex(b.color) || "")}" placeholder="#C46A4A">
+        </div>
+        <div>
+          <div class="muted">Order</div>
+          <input data-k="order" value="${escapeHtml(b.order ?? "")}" inputmode="numeric">
+        </div>
+      </div>
+
+      <div class="btnRow">
+        <label class="tag" style="cursor:pointer;">
+          <input type="checkbox" data-k="active" ${toBool(b.active) ? "checked" : ""} style="width:auto; margin:0;" />
+          <span>Active</span>
+        </label>
+        <button data-act="save">Save</button>
+      </div>
+    `;
+
+    const delBtn = card.querySelector('button[data-act="delete"]');
+    delBtn.addEventListener("click", async () => {
+      if (!confirm(`Delete bucket '${bucketLabel(b)}' from sheet?`)) return;
+      await jsonp("deleteBucket", { bucket_id: b.bucket_id });
+      await syncAll(true);
+    });
+
+    const saveBtn = card.querySelector('button[data-act="save"]');
+    saveBtn.addEventListener("click", async () => {
+      const name = card.querySelector('input[data-k="bucket_name"]').value.trim();
+      const color = card.querySelector('input[data-k="color"]').value.trim();
+      const order = card.querySelector('input[data-k="order"]').value.trim();
+      const active = card.querySelector('input[data-k="active"]').checked;
+
+      await jsonp("upsertBucket", {
+        bucket_id: b.bucket_id,
+        bucket_name: name,
+        color: color,
+        order: order,
+        active: active
+      });
+      await syncAll(true);
+    });
+
+    wrap.appendChild(card);
+  }
+}
+
+async function addBucketFlow(){
+  const id = prompt("New bucket_id (lowercase, no spaces). Example: 'commissions'")?.trim();
+  if (!id) return;
+  const name = prompt("Bucket name (human readable).")?.trim() || id;
+  const color = prompt("Bucket color hex (e.g. #C46A4A).")?.trim() || "#999999";
+  const order = prompt("Order number (e.g. 12).")?.trim() || "99";
+
+  await jsonp("upsertBucket", { bucket_id: id, bucket_name: name, color, order, active: true });
+  await syncAll(true);
+}
+
+// ====== Series manager UI ======
+function renderSeriesManager(){
+  const wrap = el("seriesList");
+  wrap.innerHTML = "";
+
+  const bIndex = new Map(buckets.map(b => [b.bucket_id, b]));
+  const list = series.slice().sort((a,b)=>seriesLabel(a).localeCompare(seriesLabel(b)));
+
+  for (const s of list){
+    const b = bIndex.get(s.bucket_id) || {};
+    const bucketCol = normalizeHex(s.color_override) || normalizeHex(b.color) || "#999";
+    const persona = (s.persona || "").trim();
+
+    const card = document.createElement("div");
+    card.className = "itemCard";
+
+    card.innerHTML = `
+      <div class="itemTop">
+        <div style="min-width:0;">
+          <div class="row" style="gap:8px; align-items:center;">
+            <span class="tag"><span class="dot" style="background:${bucketCol}"></span><span>${escapeHtml(seriesLabel(s))}</span></span>
+            ${persona ? `<span class="tag"><span class="dot" style="background:#888"></span><span>${escapeHtml(persona)}</span></span>` : ""}
+          </div>
+          <div class="smallMuted">id: ${escapeHtml(s.series_id)} • bucket: ${escapeHtml(s.bucket_id || "")}</div>
+        </div>
+        <div class="inline">
+          <button data-act="delete" class="dangerBtn">Delete</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid2">
+        <div>
+          <div class="muted">Name</div>
+          <input data-k="series_name" value="${escapeHtml(s.series_name || "")}">
+        </div>
+        <div>
+          <div class="muted">Bucket</div>
+          <select data-k="bucket_id"></select>
+        </div>
+      </div>
+
+      <div class="grid2" style="margin-top:10px;">
+        <div>
+          <div class="muted">Color override (optional)</div>
+          <input data-k="color_override" value="${escapeHtml(normalizeHex(s.color_override) || "")}" placeholder="#D966FF">
+        </div>
+        <div>
+          <div class="muted">Persona</div>
+          <input data-k="persona" value="${escapeHtml(persona)}" placeholder="Firestone / JF / CC / CD">
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <div class="muted">Description</div>
+        <textarea data-k="description" placeholder="What this series is about…">${escapeHtml(s.description || "")}</textarea>
+      </div>
+
+      <div class="btnRow">
+        <label class="tag" style="cursor:pointer;">
+          <input type="checkbox" data-k="active" ${toBool(s.active) ? "checked" : ""} style="width:auto; margin:0;" />
+          <span>Active</span>
+        </label>
+        <button data-act="save">Save</button>
+      </div>
+    `;
+
+    // bucket dropdown
+    const sel = card.querySelector('select[data-k="bucket_id"]');
+    for (const b2 of buckets.slice().sort((a,b)=>Number(a.order||999)-Number(b.order||999))){
       const opt = document.createElement("option");
-      opt.value = s.series_id;
-      opt.textContent = seriesLabel(s);
+      opt.value = b2.bucket_id;
+      opt.textContent = bucketLabel(b2);
+      if (String(b2.bucket_id) === String(s.bucket_id)) opt.selected = true;
       sel.appendChild(opt);
     }
-  }
 
-  // ====== Stats + History ======
-  function renderStatsAndHistory(){
-    const seriesMap = new Map(activeSeries().map(s => [String(s.series_id).trim(), s]));
-
-    const stats = {};
-    for (const [id, s] of seriesMap){
-      stats[id] = { chosen: 0, worked: 0, skipped: 0, name: seriesLabel(s) };
-    }
-
-    for (const e of (events || [])){
-      const sid = String(e.series_id || "").trim();
-      if (!stats[sid]) continue;
-      stats[sid].chosen += 1;
-      if (String(e.outcome).toLowerCase() === "worked") stats[sid].worked += 1;
-      if (String(e.outcome).toLowerCase() === "skipped") stats[sid].skipped += 1;
-    }
-
-    const rows = Object.values(stats).sort((a,b)=>a.name.localeCompare(b.name));
-    const tb = el("statsBody");
-    tb.innerHTML = "";
-
-    function pct(a,b){ return b ? Math.round((a/b)*100) + "%" : "—"; }
-
-    for (const r of rows){
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${escapeHtml(r.name)}</td>
-        <td>${r.chosen}</td>
-        <td>${r.worked}</td>
-        <td>${r.skipped}</td>
-        <td>${pct(r.worked, r.chosen)}</td>
-      `;
-      tb.appendChild(tr);
-    }
-
-    const hb = el("historyBody");
-    hb.innerHTML = "";
-    const recent = (events || []).slice(-30).reverse();
-    for (const e of recent){
-      const tr = document.createElement("tr");
-      const outcomeTxt = String(e.outcome).toLowerCase() === "worked" ? "✅ worked" : "⏭️ skipped";
-      tr.innerHTML = `
-        <td>${escapeHtml(e.timestamp || e.at || "")}</td>
-        <td>${escapeHtml(e.series_name || e.series_id || "")}</td>
-        <td>${outcomeTxt}</td>
-        <td>${escapeHtml((e.minutes ?? "") === "" ? "" : String(e.minutes))}</td>
-        <td>${escapeHtml(e.note || "")}</td>
-      `;
-      hb.appendChild(tr);
-    }
-  }
-
-  // ====== Bucket manager UI ======
-  function renderBucketManager(){
-    const wrap = el("bucketList");
-    wrap.innerHTML = "";
-
-    for (const b of buckets.slice().sort((a,b)=>Number(a.order||999)-Number(b.order||999))){
-      const col = normalizeHex(b.color) || "#999";
-      const card = document.createElement("div");
-      card.className = "itemCard";
-
-      card.innerHTML = `
-        <div class="itemTop">
-          <div>
-            <div class="itemName">
-              <span class="tag"><span class="dot" style="background:${col}"></span><span>${escapeHtml(bucketLabel(b))}</span></span>
-            </div>
-            <div class="smallMuted">id: ${escapeHtml(b.bucket_id)}</div>
-          </div>
-          <div class="inline">
-            <button data-act="delete" style="font-weight:900;">Delete</button>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="grid3">
-          <div>
-            <label class="muted">Name</label>
-            <input data-k="bucket_name" value="${escapeHtml(b.bucket_name || "")}">
-          </div>
-          <div>
-            <label class="muted">Color</label>
-            <input data-k="color" value="${escapeHtml(normalizeHex(b.color) || "")}" placeholder="#C46A4A">
-          </div>
-          <div>
-            <label class="muted">Order</label>
-            <input data-k="order" value="${escapeHtml(b.order ?? "")}" inputmode="numeric">
-          </div>
-        </div>
-
-        <div class="btnRow">
-          <label class="tag" style="cursor:pointer;">
-            <input type="checkbox" data-k="active" ${toBool(b.active) ? "checked" : ""} />
-            <span>Active</span>
-          </label>
-          <button data-act="save">Save</button>
-        </div>
-      `;
-
-      const delBtn = card.querySelector('button[data-act="delete"]');
-      delBtn.addEventListener("click", async () => {
-        if (!confirm(`Delete bucket '${bucketLabel(b)}' from sheet?`)) return;
-        await jsonp("deleteBucket", { bucket_id: b.bucket_id });
-        await syncAll(true);
-      });
-
-      const saveBtn = card.querySelector('button[data-act="save"]');
-      saveBtn.addEventListener("click", async () => {
-        const name = card.querySelector('input[data-k="bucket_name"]').value.trim();
-        const color = card.querySelector('input[data-k="color"]').value.trim();
-        const order = card.querySelector('input[data-k="order"]').value.trim();
-        const active = card.querySelector('input[data-k="active"]').checked;
-
-        await jsonp("upsertBucket", {
-          bucket_id: b.bucket_id,
-          bucket_name: name,
-          color: color,
-          order: order,
-          active: active
-        });
-        await syncAll(true);
-      });
-
-      wrap.appendChild(card);
-    }
-  }
-
-  async function addBucketFlow(){
-    const id = prompt("New bucket_id (lowercase, no spaces). Example: 'commissions'")?.trim();
-    if (!id) return;
-    const name = prompt("Bucket name (human readable).")?.trim() || id;
-    const color = prompt("Bucket color hex (e.g. #C46A4A).")?.trim() || "#999999";
-    const order = prompt("Order number (e.g. 12).")?.trim() || "99";
-
-    await jsonp("upsertBucket", { bucket_id: id, bucket_name: name, color, order, active: true });
-    await syncAll(true);
-  }
-
-  // ====== Series manager UI ======
-  function renderSeriesManager(){
-    const wrap = el("seriesList");
-    wrap.innerHTML = "";
-
-    const bIndex = new Map(buckets.map(b => [b.bucket_id, b]));
-    const list = series
-      .slice()
-      .sort((a,b)=>seriesLabel(a).localeCompare(seriesLabel(b)));
-
-    for (const s of list){
-      const b = bIndex.get(s.bucket_id) || {};
-      const bucketCol = normalizeHex(s.color_override) || normalizeHex(b.color) || "#999";
-      const persona = (s.persona || "").trim();
-
-      const card = document.createElement("div");
-      card.className = "itemCard";
-
-      card.innerHTML = `
-        <div class="itemTop">
-          <div style="min-width:0;">
-            <div class="itemName">
-              <span class="tag"><span class="dot" style="background:${bucketCol}"></span><span>${escapeHtml(seriesLabel(s))}</span></span>
-              ${persona ? `<span class="tag" style="margin-left:8px;"><span class="dot" style="background:#888"></span><span>${escapeHtml(persona)}</span></span>` : ""}
-            </div>
-            <div class="smallMuted">id: ${escapeHtml(s.series_id)} • bucket: ${escapeHtml(s.bucket_id || "")}</div>
-          </div>
-          <div class="inline">
-            <button data-act="delete" style="font-weight:900;">Delete</button>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="grid2">
-          <div>
-            <label class="muted">Name</label>
-            <input data-k="series_name" value="${escapeHtml(s.series_name || "")}">
-          </div>
-          <div>
-            <label class="muted">Bucket</label>
-            <select data-k="bucket_id"></select>
-          </div>
-        </div>
-
-        <div class="grid2" style="margin-top:10px;">
-          <div>
-            <label class="muted">Color override (optional)</label>
-            <input data-k="color_override" value="${escapeHtml(normalizeHex(s.color_override) || "")}" placeholder="#D966FF">
-          </div>
-          <div>
-            <label class="muted">Persona</label>
-            <input data-k="persona" value="${escapeHtml(persona)}" placeholder="Firestone / JF / CC / CD">
-          </div>
-        </div>
-
-        <div style="margin-top:10px;">
-          <label class="muted">Description (collapsible idea text)</label>
-          <textarea data-k="description" placeholder="What this series is about…">${escapeHtml(s.description || "")}</textarea>
-        </div>
-
-        <div class="btnRow">
-          <label class="tag" style="cursor:pointer;">
-            <input type="checkbox" data-k="active" ${toBool(s.active) ? "checked" : ""} />
-            <span>Active</span>
-          </label>
-          <button data-act="save">Save</button>
-        </div>
-      `;
-
-      // bucket dropdown
-      const sel = card.querySelector('select[data-k="bucket_id"]');
-      for (const b2 of buckets.slice().sort((a,b)=>Number(a.order||999)-Number(b.order||999))){
-        const opt = document.createElement("option");
-        opt.value = b2.bucket_id;
-        opt.textContent = bucketLabel(b2);
-        if (String(b2.bucket_id) === String(s.bucket_id)) opt.selected = true;
-        sel.appendChild(opt);
-      }
-
-      const delBtn = card.querySelector('button[data-act="delete"]');
-      delBtn.addEventListener("click", async () => {
-        if (!confirm(`Delete series '${seriesLabel(s)}' from sheet?`)) return;
-        await jsonp("deleteSeries", { series_id: s.series_id });
-        await syncAll(true);
-      });
-
-      const saveBtn = card.querySelector('button[data-act="save"]');
-      saveBtn.addEventListener("click", async () => {
-        const series_name = card.querySelector('input[data-k="series_name"]').value.trim();
-        const bucket_id = card.querySelector('select[data-k="bucket_id"]').value.trim();
-        const color_override = card.querySelector('input[data-k="color_override"]').value.trim();
-        const persona2 = card.querySelector('input[data-k="persona"]').value.trim();
-        const description = card.querySelector('textarea[data-k="description"]').value;
-        const active = card.querySelector('input[data-k="active"]').checked;
-
-        await jsonp("upsertSeries", {
-          series_id: s.series_id,
-          series_name,
-          bucket_id,
-          color_override,
-          persona: persona2,
-          description,
-          active
-        });
-        await syncAll(true);
-      });
-
-      wrap.appendChild(card);
-    }
-  }
-
-  async function addSeriesFlow(){
-    const id = prompt("New series_id (lowercase, no spaces). Example: 'totem_poles'")?.trim();
-    if (!id) return;
-    const name = prompt("Series name (human readable).")?.trim() || id;
-    const bucket_id = prompt("Bucket id to start in (e.g., 'active', 'ondeck', 'lexicon').")?.trim() || "ondeck";
-    const persona = prompt("Persona (optional): Firestone / JF / CC / CD")?.trim() || "";
-    const description = prompt("Short description (optional).")?.trim() || "";
-
-    await jsonp("upsertSeries", {
-      series_id: id,
-      series_name: name,
-      bucket_id,
-      persona,
-      description,
-      active: true
-    });
-    await syncAll(true);
-  }
-
-
-
-  // NOTE: Your full bucket/series manager code is unchanged in behavior.
-  // If you want it verbatim re-inserted here, paste your current baseline’s
-  // renderBucketManager/renderSeriesManager/addBucketFlow/addSeriesFlow blocks.
-
-  async function syncAll(silent=false){
-    try {
-      if (!silent) statusLine.textContent = "Syncing…";
-
-      const [bRaw,sRaw,eRaw] = await Promise.all([
-        jsonp("getBuckets"),
-        jsonp("getSeries"),
-        jsonp("getEvents", { limit: 2000 })
-      ]);
-
-      if (hasError(bRaw) || hasError(sRaw) || hasError(eRaw)) throw new Error("API error");
-
-      const bArr = asArray(bRaw);
-      const sArr = asArray(sRaw);
-      const eArr = asArray(eRaw);
-
-      buckets = bArr.map(x => ({ ...x, color: normalizeHex(x.color), active: toBool(x.active) }));
-      series  = sArr.map(x => ({ ...x, color_override: normalizeHex(x.color_override), active: toBool(x.active) }));
-
-      const sheetEvents = eArr.map(x => ({
-        ...x,
-        timestamp: x.timestamp || x.at || "",
-        minutes: (x.minutes === "" || x.minutes === undefined || x.minutes === null) ? "" : Number(x.minutes)
-      }));
-
-      const local = loadCache(LS_EVENTS, []);
-      const byId = new Map();
-      for (const ev of sheetEvents) byId.set(String(ev.id), ev);
-      for (const ev of local) if (!byId.has(String(ev.id))) byId.set(String(ev.id), ev);
-
-      events = Array.from(byId.values()).sort((a,b)=>String(a.timestamp).localeCompare(String(b.timestamp)));
-
-      saveCache(LS_BUCKETS, buckets);
-      saveCache(LS_SERIES, series);
-      saveCache(LS_EVENTS, events);
-
-      // Keep filters sane if new buckets appear
-      const f = loadFilters();
-      let changed = false;
-      for (const b of activeBuckets()){
-        if (f[b.bucket_id] === undefined){
-          f[b.bucket_id] = true;
-          changed = true;
-        }
-      }
-      if (changed) saveFilters(f);
-
-      renderFiltersDrawer();
-      renderManualSelect();
-      renderBucketManager();
-      renderSeriesManager();
-      renderStatsAndHistory();
-
-      setCloud(true, "Cloud: ok");
-      statusLine.textContent = `Loaded ${buckets.length} buckets • ${series.length} series • ${events.length} events (sheet returned ${sheetEvents.length})`;
-    } catch (err){
-      buckets = loadCache(LS_BUCKETS, []);
-      series  = loadCache(LS_SERIES, []);
-      events  = loadCache(LS_EVENTS, []);
-
-      renderFiltersDrawer();
-      renderManualSelect();
-      renderBucketManager();
-      renderSeriesManager();
-      renderStatsAndHistory();
-
-      setCloud(false, "Cloud: offline?");
-      statusLine.textContent = "Offline mode: using local cache. (Sync when connection returns.)";
-    }
-  }
-
-  function init(){
-    const theme = localStorage.getItem(LS_THEME) || "light";
-    applyTheme(theme);
-    el("themeBtn").addEventListener("click", () => {
-      const cur = localStorage.getItem(LS_THEME) || "light";
-      applyTheme(cur === "dark" ? "light" : "dark");
+    const delBtn = card.querySelector('button[data-act="delete"]');
+    delBtn.addEventListener("click", async () => {
+      if (!confirm(`Delete series '${seriesLabel(s)}' from sheet?`)) return;
+      await jsonp("deleteSeries", { series_id: s.series_id });
+      await syncAll(true);
     });
 
-    // user label
-    el("userLabel").value = localStorage.getItem(LS_USER) || "John";
-    el("userLabel").addEventListener("input", () => localStorage.setItem(LS_USER, el("userLabel").value));
+    const saveBtn = card.querySelector('button[data-act="save"]');
+    saveBtn.addEventListener("click", async () => {
+      const series_name = card.querySelector('input[data-k="series_name"]').value.trim();
+      const bucket_id = card.querySelector('select[data-k="bucket_id"]').value.trim();
+      const color_override = card.querySelector('input[data-k="color_override"]').value.trim();
+      const persona2 = card.querySelector('input[data-k="persona"]').value.trim();
+      const description = card.querySelector('textarea[data-k="description"]').value;
+      const active = card.querySelector('input[data-k="active"]').checked;
 
-    // filters drawer wiring
-    el("toggleFiltersBtn").addEventListener("click", toggleFiltersDrawer);
-    el("clearFiltersBtn").addEventListener("click", () => setAllFilters(false));
-    el("allFiltersBtn").addEventListener("click", () => setAllFilters(true));
+      await jsonp("upsertSeries", {
+        series_id: s.series_id,
+        series_name,
+        bucket_id,
+        color_override,
+        persona: persona2,
+        description,
+        active
+      });
+      await syncAll(true);
+    });
 
-    // time controls wiring
-    wireTimeControls("spin");
-    wireTimeControls("manual");
-    updateTimeLabels();
-
-    // buttons
-    el("syncBtn").addEventListener("click", () => syncAll(false));
-    el("spinBtn").addEventListener("click", spin);
-    el("workedBtn").addEventListener("click", () => logSpin("worked"));
-    el("skippedBtn").addEventListener("click", () => logSpin("skipped"));
-    el("manualWorkedBtn").addEventListener("click", logManual);
-    el("addBucketBtn").addEventListener("click", addBucketFlow);
-    el("addSeriesBtn").addEventListener("click", addSeriesFlow);
-
-    setCloud(false, "Cloud: —");
-    syncAll(true);
+    wrap.appendChild(card);
   }
+}
 
-  init();
+async function addSeriesFlow(){
+  const id = prompt("New series_id (lowercase, no spaces). Example: 'totem_poles'")?.trim();
+  if (!id) return;
+  const name = prompt("Series name (human readable).")?.trim() || id;
+  const bucket_id = prompt("Bucket id to start in (e.g., 'active', 'ondeck', 'lexicon').")?.trim() || "ondeck";
+  const persona = prompt("Persona (optional): Firestone / JF / CC / CD")?.trim() || "";
+  const description = prompt("Short description (optional).")?.trim() || "";
+
+  await jsonp("upsertSeries", { series_id: id, series_name: name, bucket_id, persona, description, active: true });
+  await syncAll(true);
+}
+
+// ====== Sync ======
+async function syncAll(silent=false){
+  try{
+    if (!silent) statusLine.textContent = "Syncing…";
+
+    const [bRaw,sRaw,eRaw] = await Promise.all([
+      jsonp("getBuckets"),
+      jsonp("getSeries"),
+      jsonp("getEvents", { limit: 2000 })
+    ]);
+
+    if (hasError(bRaw) || hasError(sRaw) || hasError(eRaw)) throw new Error("API error");
+
+    const bArr = asArray(bRaw);
+    const sArr = asArray(sRaw);
+    const eArr = asArray(eRaw);
+
+    buckets = bArr.map(x => ({ ...x, color: normalizeHex(x.color), active: toBool(x.active) }));
+    series  = sArr.map(x => ({ ...x, color_override: normalizeHex(x.color_override), active: toBool(x.active) }));
+
+    const sheetEvents = eArr.map(x => ({
+      ...x,
+      timestamp: x.timestamp || x.at || "",
+      minutes: (x.minutes === "" || x.minutes === undefined || x.minutes === null) ? "" : Number(x.minutes)
+    }));
+
+    const local = loadCache(LS_EVENTS, []);
+    const byId = new Map();
+    for (const ev of sheetEvents) byId.set(String(ev.id), ev);
+    for (const ev of local) if (!byId.has(String(ev.id))) byId.set(String(ev.id), ev);
+
+    events = Array.from(byId.values()).sort((a,b)=>String(a.timestamp).localeCompare(String(b.timestamp)));
+
+    saveCache(LS_BUCKETS, buckets);
+    saveCache(LS_SERIES, series);
+    saveCache(LS_EVENTS, events);
+
+    // Keep filters sane if new buckets appear
+    const f = loadFilters();
+    let changed = false;
+    for (const b of activeBuckets()){
+      if (f[b.bucket_id] === undefined){
+        f[b.bucket_id] = true;
+        changed = true;
+      }
+    }
+    if (changed) saveFilters(f);
+
+    renderFiltersDrawer();
+    renderManualSelect();
+    renderBucketManager();
+    renderSeriesManager();
+    renderStatsAndHistory();
+
+    setCloud(true, "Cloud: ok");
+    statusLine.textContent = `Loaded ${buckets.length} buckets • ${series.length} series • ${events.length} events`;
+  } catch(err){
+    buckets = loadCache(LS_BUCKETS, []);
+    series  = loadCache(LS_SERIES, []);
+    events  = loadCache(LS_EVENTS, []);
+
+    renderFiltersDrawer();
+    renderManualSelect();
+    renderBucketManager();
+    renderSeriesManager();
+    renderStatsAndHistory();
+
+    setCloud(false, "Cloud: offline?");
+    statusLine.textContent = "Offline mode: using local cache. (Sync when connection returns.)";
+  }
+}
+
+// ====== Init ======
+function init(){
+  const theme = localStorage.getItem(LS_THEME) || "dark";
+  applyTheme(theme);
+  el("themeBtn").addEventListener("click", () => {
+    const cur = localStorage.getItem(LS_THEME) || "dark";
+    applyTheme(cur === "dark" ? "light" : "dark");
+  });
+
+  el("userLabel").value = localStorage.getItem(LS_USER) || "John";
+  el("userLabel").addEventListener("input", () => localStorage.setItem(LS_USER, el("userLabel").value));
+
+  el("toggleFiltersBtn").addEventListener("click", toggleFiltersDrawer);
+  el("clearFiltersBtn").addEventListener("click", () => setAllFilters(false));
+  el("allFiltersBtn").addEventListener("click", () => setAllFilters(true));
+
+  wireTimeControls("spin");
+  wireTimeControls("manual");
+  updateTimeLabels();
+
+  el("syncBtn").addEventListener("click", () => syncAll(false));
+  el("spinBtn").addEventListener("click", spin);
+  el("workedBtn").addEventListener("click", () => logSpin("worked"));
+  el("skippedBtn").addEventListener("click", () => logSpin("skipped"));
+  el("manualWorkedBtn").addEventListener("click", () => logManual("worked"));
+  el("manualSkippedBtn").addEventListener("click", () => logManual("skipped"));
+  el("addBucketBtn").addEventListener("click", addBucketFlow);
+  el("addSeriesBtn").addEventListener("click", addSeriesFlow);
+
+  setCloud(false, "Cloud: —");
+  syncAll(true);
+}
+
+init();
 </script>
 </body>
 </html>
