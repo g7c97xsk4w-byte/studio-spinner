@@ -421,7 +421,9 @@ function beaconWrite(action, payload){
 
     const img = new Image();
     img.onload = () => resolve({ ok: true });
-    img.onerror = () => reject(new Error("Beacon failed"));
+    // iOS Safari often triggers `onerror` because Apps Script returns JSON/JS, not an image.
+    // The request can still succeed (sheet updates), so treat onerror as "sent".
+    img.onerror = () => resolve({ ok: true, note: "safari-nosniff-false-negative" });
     img.src = API_URL + "?" + qs.toString();
   });
 }
